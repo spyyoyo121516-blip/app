@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPY YOYO | CENTRAL HUB</title>
+    <style>
+        :root {
+            --neon: #00f2ff;
+            --pink: #ff007b;
+            --dark: #050505;
+            --glass: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 123, 0.03) 0%, transparent 40%),
+                #050505;
+            color: white;
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--neon);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 180px 20px 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        /* Grid */
+        .grid {
+            max-width: 1200px;
+            margin: 0 auto 120px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 60px 30px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        .card:not(.locked):hover {
+            transform: translateY(-10px);
+            border-color: var(--neon);
+            background: rgba(0, 242, 255, 0.04);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+
+        .card i { font-size: 50px; margin-bottom: 20px; }
+        .card h2 { font-size: 1.4rem; margin-bottom: 10px; }
+        .card p { font-size: 0.95rem; color: #555; line-height: 1.5; }
+
+        /* --- PROFESSIONAL COMING SOON ONLY --- */
+        .locked {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: not-allowed;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+
+        .corner-badge {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 0, 123, 0.32);
+            background: rgba(255, 0, 123, 0.1);
+            color: #ffd2e7;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(255, 0, 123, 0.14);
+        }
+
+        .coming-only {
+            border-color: rgba(0, 242, 255, 0.22);
+            background:
+                radial-gradient(circle at top, rgba(0, 242, 255, 0.12), transparent 45%),
+                radial-gradient(circle at bottom right, rgba(255, 0, 123, 0.14), transparent 40%),
+                rgba(255, 255, 255, 0.02);
+        }
+
+        .coming-only .cs-title {
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-shadow: 0 0 25px rgba(0, 242, 255, 0.25);
+        }
+
+        .coming-only .loading-line {
+            width: 170px;
+            height: 3px;
+            margin-top: 24px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .status-tag {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--pink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--pink);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--pink);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; }
+        }
+
+        .cs-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            margin: 0;
+        }
+
+        .loading-line {
+            width: 140px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .loading-line::after {
+            content: "";
+            position: absolute;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--pink), transparent);
+            animation: slide 3s infinite linear;
+        }
+
+        @keyframes slide {
+            0% { left: -100%; } 100% { left: 100%; }
+        }
+
+        footer {
+            padding: 80px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: #333;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">SPY YOYO</div>
+        <div style="font-size: 11px; color: #0f0; border: 1px solid rgba(0,255,0,0.2); padding: 5px 12px; border-radius: 6px;">
+            SECURE LINK ACTIVE
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Welcome, Agent.</h1>
+        <p>Select a verified sector to access the Spy Yoyo network data banks.</p>
+    </div>
+
+    <div class="grid">
+        <a href="/school" class="card">
+            <i>🏫</i>
+            <h2>Amgad School Portal</h2>
+            <p>Official gateway for institutional news, exams, and schedules.</p>
+        </a>
+
+        <a href="/kingdom" class="card">
+            <i>⚔️</i>
+            <h2>Kingdom Game</h2>
+            <p>Enter the multiplayer realm and forge your character soul.</p>
+        </a>
+
+        <a href="/emails" class="card">
+            <i>✉️</i>
+            <h2>Secure Inbox</h2>
+            <p>Private communication terminal for encrypted system links.</p>
+        </a>
+
+        <a href="https://app.spyyoyo.xyz" class="card">
+            <i>[A]</i>
+            <h2>App</h2>
+            <p>Open the SPY YOYO app page.</p>
+        </a>
+
+        <a href="#" class="card locked" aria-disabled="true" tabindex="-1">
+            <span class="corner-badge">Coming Soon</span>
+            <i>[+]</i>
+            <h2>Andulisa Queue</h2>
+            <p>Track clinic queue numbers and open the Andalusia monitor tools.</p>
+        </a>
+
+        <div class="card locked coming-only" aria-hidden="true">
+            <span class="corner-badge">Coming Soon</span>
+            <div class="status-tag">
+                <span class="pulse-dot"></span>
+                Coming Soon
+            </div>
+            <h2 class="cs-title">Coming Soon</h2>
+            <div class="loading-line"></div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 SPY YOYO NETWORK | MADE BY YOUSSEF AYMAN
+    </footer>
+
+</body>
+</html>
