@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy Yoyo Admin Login</title>
+    <style>
+        :root {
+            --bg: #08111f;
+            --panel: rgba(10, 19, 35, 0.88);
+            --line: rgba(142, 226, 255, 0.18);
+            --text: #f7fbff;
+            --muted: #9eb1cb;
+            --cyan: #7ce8ff;
+            --mint: #7bf1c3;
+            --gold: #ffd978;
+            --danger: #ff7998;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: var(--text);
+            font-family: Georgia, 'Times New Roman', serif;
+            background:
+                radial-gradient(circle at top, rgba(123, 241, 195, 0.16), transparent 28%),
+                radial-gradient(circle at right, rgba(124, 232, 255, 0.16), transparent 24%),
+                linear-gradient(160deg, #02060d 0%, #08111f 42%, #0d1830 100%);
+        }
+
+        .panel {
+            width: min(100%, 980px);
+            padding: 26px;
+            border-radius: 34px;
+            background: rgba(7, 14, 28, 0.82);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.9fr);
+            gap: 18px;
+        }
+
+        .mini-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .mini-nav span {
+            padding: 10px 13px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .hero,
+        .form-shell {
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 28px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(124, 232, 255, 0.18);
+            color: var(--cyan);
+            background: rgba(124, 232, 255, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.72rem;
+        }
+
+        h1 {
+            margin: 18px 0 12px;
+            font-size: clamp(2.4rem, 6vw, 4.4rem);
+            line-height: 0.95;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .hero-points {
+            display: grid;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .hero-point {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .hero-point strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            padding: 15px 16px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        button,
+        .back {
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            padding: 15px 18px;
+            background: linear-gradient(135deg, #49dcb1, #6ca8ff);
+            color: #05131b;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back {
+            margin-top: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .error {
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 121, 152, 0.14);
+            border: 1px solid rgba(255, 121, 152, 0.25);
+            color: #ffd4de;
+        }
+
+        @media (max-width: 860px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <div class="mini-nav">
+            <span>Admin Home</span>
+            <span>Dashboard</span>
+            <span>Kingdom Admin</span>
+            <span>Notes</span>
+            <span>Links</span>
+        </div>
+        <div class="layout">
+            <section class="hero">
+                <span class="eyebrow">Protected Entry</span>
+                <h1>Admin Login</h1>
+                <p>Professional access point for the full Spy Yoyo admin suite. Use the master password to enter the dashboard, kingdom control, notes, and links.</p>
+                <div class="hero-points">
+                    <div class="hero-point">
+                        <strong>Admin Index</strong>
+                        <p>Open the polished main control page.</p>
+                    </div>
+                    <div class="hero-point">
+                        <strong>Dashboard</strong>
+                        <p>Monitor users, IP activity, and visible admin actions.</p>
+                    </div>
+                    <div class="hero-point">
+                        <strong>Control Rooms</strong>
+                        <p>Move into school admin or kingdom admin from the same system.</p>
+                    </div>
+                </div>
+            </section>
+            <form class="form-shell" method="post">
+                <h2>Enter Admin</h2>
+                <p style="margin-bottom:18px;">Sign in to continue into the admin control suite.</p>
+                {% if error %}
+                <div class="error">{{ error }}</div>
+                {% endif %}
+                <input type="password" name="password" placeholder="Master password" required>
+                <button type="submit">Enter admin</button>
+                <a class="back" href="{{ url_for('index') }}">Back to website</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

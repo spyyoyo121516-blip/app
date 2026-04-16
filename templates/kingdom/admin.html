@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Admin | Realm Control</title>
+    <style>
+        :root {
+            --bg: #06120f;
+            --panel: rgba(10, 24, 18, 0.84);
+            --line: rgba(127, 255, 190, 0.16);
+            --text: #f6fff9;
+            --muted: #9fc3b2;
+            --mint: #8df7be;
+            --gold: #ffd978;
+            --danger: #ff9b9b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: Georgia, 'Times New Roman', serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(141, 247, 190, 0.12), transparent 24%),
+                radial-gradient(circle at 84% 18%, rgba(255, 217, 120, 0.1), transparent 22%),
+                radial-gradient(circle at 82% 84%, rgba(141, 247, 190, 0.08), transparent 20%),
+                linear-gradient(150deg, #020906 0%, #071712 44%, #10291f 100%);
+            padding: 28px;
+        }
+
+        a { color: inherit; }
+
+        .wrap {
+            max-width: 1360px;
+            margin: 0 auto;
+        }
+
+        .suite-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .suite-nav a {
+            text-decoration: none;
+            color: var(--text);
+            padding: 11px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            font-size: 0.95rem;
+        }
+
+        .suite-nav a.active {
+            background: linear-gradient(135deg, rgba(141, 247, 190, 0.18), rgba(255, 217, 120, 0.14));
+        }
+
+        .hero,
+        .stat,
+        .panel,
+        .user-card,
+        .log-item {
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+        }
+
+        .hero {
+            padding: 34px;
+            margin-bottom: 20px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.85fr);
+            gap: 20px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(141, 247, 190, 0.18);
+            color: var(--mint);
+            background: rgba(141, 247, 190, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.72rem;
+        }
+
+        h1 {
+            margin: 18px 0 12px;
+            font-size: clamp(2.8rem, 7vw, 5rem);
+            line-height: 0.95;
+            text-transform: uppercase;
+        }
+
+        p { color: var(--muted); line-height: 1.7; }
+
+        .back {
+            display: inline-flex;
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--text);
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .hero-side {
+            padding: 24px;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            padding: 22px;
+        }
+
+        .stat small {
+            display: block;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--muted);
+        }
+
+        .stat strong {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
+            gap: 20px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 20px;
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .user-grid,
+        .log-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .user-card,
+        .log-item {
+            padding: 18px;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(141, 247, 190, 0.1);
+            color: var(--mint);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.76rem;
+        }
+
+        .hero-img {
+            width: 88px;
+            height: 88px;
+            border-radius: 22px;
+            object-fit: cover;
+            border: 1px solid rgba(141, 247, 190, 0.24);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .user-main {
+            display: grid;
+            grid-template-columns: 88px minmax(0, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .empty-hero {
+            width: 88px;
+            height: 88px;
+            display: grid;
+            place-items: center;
+            border-radius: 22px;
+            border: 1px dashed rgba(255,255,255,0.12);
+            color: var(--muted);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .powers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.05);
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        code {
+            color: var(--gold);
+            font-family: Consolas, 'Courier New', monospace;
+        }
+
+        @media (max-width: 1080px) {
+            .hero-grid,
+            .layout,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .user-main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if not admin_unlocked %}
+    <div id="gate" style="position:fixed;inset:0;z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,5,13,0.94);backdrop-filter:blur(12px);">
+        <div style="width:min(460px,100%);padding:34px;border-radius:30px;border:1px solid rgba(141,247,190,0.18);background:rgba(8,18,35,0.96);box-shadow:0 24px 80px rgba(0,0,0,0.45);text-align:center;">
+            <h2 style="margin:18px 0 12px;font-size:2rem;text-transform:uppercase;letter-spacing:.04em;">Admin Password</h2>
+            <p>Enter the master password to open this admin page.</p>
+            <input id="admin-pass" type="password" placeholder="Admin password" style="width:100%;margin-top:18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font:inherit;">
+            <button type="button" onclick="unlockAdmin()" style="width:100%;margin-top:14px;padding:14px 16px;border:none;border-radius:16px;font:inherit;font-weight:700;cursor:pointer;color:#06111f;background:linear-gradient(135deg,#8df7be,#ffd978);">Open page</button>
+            <div id="gate-error" style="display:none;margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,121,152,0.14);border:1px solid rgba(255,121,152,0.25);color:#ffd4de;">Wrong password. Try again.</div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="wrap"{% if not admin_unlocked %} style="display:none;"{% endif %}>
+        <nav class="suite-nav">
+            <a href="{{ url_for('admin_index') }}">Admin Home</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a class="active" href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
+            <a href="{{ url_for('admin_notes') }}">Notes</a>
+            <a href="{{ url_for('admin_links') }}">Links</a>
+        </nav>
+        <section class="hero">
+            <div class="hero-grid">
+                <div>
+                    <span class="eyebrow">Realm Wing</span>
+                    <h1>Kingdom Control Room</h1>
+                    <p>Professional kingdom administration workspace for registered souls, forged heroes, pending verifications, and recent realm activity.</p>
+                    <a class="back" href="{{ url_for('admin_index') }}">Back to admin home</a>
+                </div>
+                <aside class="hero-side">
+                    <h3>Realm Overview</h3>
+                    <p>This page now looks like a real admin room instead of a plain table. It shows realm counts, user cards, hero visuals, and recent kingdom logs.</p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat"><small>Registered Souls</small><strong id="total-users">0</strong></div>
+            <div class="stat"><small>Forged Heroes</small><strong id="total-heroes">0</strong></div>
+            <div class="stat"><small>Pending Verifications</small><strong id="pending-count">0</strong></div>
+            <div class="stat"><small>Battle Logs</small><strong id="log-count">0</strong></div>
+        </section>
+
+        <section class="layout">
+            <div class="stack">
+                <div class="panel">
+                    <h2>Registered Souls</h2>
+                    <p>All kingdom accounts with their linked hero information.</p>
+                    <div id="user-grid" class="user-grid"></div>
+                </div>
+            </div>
+
+            <div class="stack">
+                <div class="panel">
+                    <h2>Recent Kingdom Logs</h2>
+                    <div id="log-grid" class="log-grid"></div>
+                </div>
+                <div class="panel">
+                    <h2>Pending Verifications</h2>
+                    <div id="pending-grid" class="log-grid"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const nextTarget = {{ next_target|tojson }};
+
+        async function unlockAdmin() {
+            const passInput = document.getElementById('admin-pass');
+            const errorBox = document.getElementById('gate-error');
+            if (!passInput) return;
+            const res = await fetch('/api/admin/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ password: passInput.value })
+            });
+            if (res.ok) {
+                window.location.href = nextTarget || '/admin';
+                return;
+            }
+            if (errorBox) errorBox.style.display = 'block';
+        }
+
+        function createEl(tag, className, text) {
+            const el = document.createElement(tag);
+            if (className) el.className = className;
+            if (text != null) el.textContent = text;
+            return el;
+        }
+
+        async function load() {
+            const res = await fetch('/api/kingdom/data');
+            const data = await res.json();
+
+            const users = Array.isArray(data.users) ? data.users : [];
+            const heroes = data.heroes || {};
+            const logs = Array.isArray(data.logs) ? data.logs.slice().reverse() : [];
+            const pending = Array.isArray(data.pending_verifications) ? data.pending_verifications.slice().reverse() : [];
+
+            document.getElementById('total-users').innerText = users.length;
+            document.getElementById('total-heroes').innerText = Object.keys(heroes).length;
+            document.getElementById('pending-count').innerText = pending.length;
+            document.getElementById('log-count').innerText = logs.length;
+
+            const userGrid = document.getElementById('user-grid');
+            userGrid.replaceChildren();
+            if (!users.length) {
+                userGrid.appendChild(createEl('div', 'log-item', 'No registered souls found.'));
+            }
+
+            users.forEach((user) => {
+                const hero = heroes[user.username] || {};
+                const card = createEl('article', 'user-card');
+
+                const header = createEl('div', 'user-header');
+                header.appendChild(createEl('strong', '', user.username || 'Unknown'));
+                header.appendChild(createEl('span', 'badge', hero.hero_name || 'No Hero'));
+                card.appendChild(header);
+
+                const main = createEl('div', 'user-main');
+                if (hero.sprite) {
+                    const img = document.createElement('img');
+                    img.className = 'hero-img';
+                    img.src = hero.sprite;
+                    img.alt = (hero.hero_name || user.username || 'Hero') + ' sprite';
+                    main.appendChild(img);
+                } else {
+                    main.appendChild(createEl('div', 'empty-hero', 'No Hero'));
+                }
+
+                const info = createEl('div');
+                info.appendChild(createEl('p', '', 'Email: ' + (user.email || '-')));
+                if (user.birthdate) info.appendChild(createEl('p', '', 'Birthdate: ' + user.birthdate));
+                if (hero.story) info.appendChild(createEl('p', '', hero.story.slice(0, 220) + (hero.story.length > 220 ? '...' : '')));
+
+                const powers = createEl('div', 'powers');
+                const heroPowers = Array.isArray(hero.powers) ? hero.powers : [];
+                if (heroPowers.length) {
+                    heroPowers.forEach((power) => powers.appendChild(createEl('span', 'pill', power)));
+                } else {
+                    powers.appendChild(createEl('span', 'pill', 'No powers listed'));
+                }
+                info.appendChild(powers);
+                main.appendChild(info);
+                card.appendChild(main);
+                userGrid.appendChild(card);
+            });
+
+            const logGrid = document.getElementById('log-grid');
+            logGrid.replaceChildren();
+            if (!logs.length) {
+                logGrid.appendChild(createEl('div', 'log-item', 'No kingdom logs yet.'));
+            }
+            logs.slice(0, 10).forEach((log) => {
+                const item = createEl('article', 'log-item');
+                item.appendChild(createEl('strong', '', log.type || 'Activity'));
+                item.appendChild(createEl('p', '', 'User: ' + (log.username || '-')));
+                if (log.hero_name) item.appendChild(createEl('p', '', 'Hero: ' + log.hero_name));
+                if (log.created_at) item.appendChild(createEl('p', '', 'Time: ' + log.created_at));
+                logGrid.appendChild(item);
+            });
+
+            const pendingGrid = document.getElementById('pending-grid');
+            pendingGrid.replaceChildren();
+            if (!pending.length) {
+                pendingGrid.appendChild(createEl('div', 'log-item', 'No pending verification requests.'));
+            }
+            pending.slice(0, 8).forEach((entry) => {
+                const item = createEl('article', 'log-item');
+                item.appendChild(createEl('strong', '', entry.username || 'Unknown'));
+                item.appendChild(createEl('p', '', 'Email: ' + (entry.email || '-')));
+                if (entry.expires_at) item.appendChild(createEl('p', '', 'Expires: ' + entry.expires_at));
+                if (entry.otp) item.appendChild(createEl('p', '', 'OTP: ' + entry.otp));
+                pendingGrid.appendChild(item);
+            });
+        }
+
+        load();
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && document.getElementById('gate')) unlockAdmin();
+        });
+
+        if (document.getElementById('gate')) {
+            const savedPassword = sessionStorage.getItem('adminMasterPassword');
+            const passInput = document.getElementById('admin-pass');
+            if (savedPassword && passInput) {
+                passInput.value = savedPassword;
+                unlockAdmin();
+            }
+        }
+    </script>
+</body>
+</html>

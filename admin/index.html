@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy Yoyo Admin Nexus</title>
+    <style>
+        :root {
+            --bg: #07111f;
+            --bg-deep: #030712;
+            --panel: rgba(10, 18, 34, 0.82);
+            --panel-strong: rgba(17, 28, 48, 0.95);
+            --line: rgba(130, 203, 255, 0.18);
+            --text: #f6fbff;
+            --muted: #9fb1c9;
+            --cyan: #78ecff;
+            --mint: #7af3c4;
+            --gold: #ffd978;
+            --danger: #ff9b9b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: Georgia, 'Times New Roman', serif;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(120, 236, 255, 0.18), transparent 24%),
+                radial-gradient(circle at 85% 16%, rgba(255, 217, 120, 0.14), transparent 20%),
+                radial-gradient(circle at 80% 80%, rgba(122, 243, 196, 0.14), transparent 24%),
+                linear-gradient(140deg, #02050d 0%, #07111f 44%, #0b1d37 100%);
+            padding: 28px;
+        }
+
+        #gate {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(2, 5, 13, 0.94);
+            backdrop-filter: blur(12px);
+        }
+
+        .gate-box {
+            width: min(460px, 100%);
+            padding: 34px;
+            border-radius: 30px;
+            border: 1px solid var(--line);
+            background: rgba(7, 14, 28, 0.96);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+            text-align: center;
+        }
+
+        .gate-box h2 {
+            margin: 18px 0 12px;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .gate-box p {
+            max-width: none;
+        }
+
+        .gate-input {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font: inherit;
+        }
+
+        .gate-btn {
+            width: 100%;
+            margin-top: 14px;
+            padding: 14px 16px;
+            border: none;
+            border-radius: 16px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            color: #06111f;
+            background: linear-gradient(135deg, #78ecff, #7af3c4);
+        }
+
+        .gate-error {
+            display: none;
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 121, 152, 0.14);
+            border: 1px solid rgba(255, 121, 152, 0.25);
+            color: #ffd4de;
+        }
+
+        .shell {
+            max-width: 1360px;
+            margin: 0 auto;
+        }
+
+        .suite-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .suite-nav a {
+            text-decoration: none;
+            color: var(--text);
+            padding: 11px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            font-size: 0.95rem;
+        }
+
+        .suite-nav a.active {
+            background: linear-gradient(135deg, rgba(120, 236, 255, 0.18), rgba(122, 243, 196, 0.16));
+            color: #ffffff;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 42px;
+            border-radius: 34px;
+            border: 1px solid var(--line);
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)),
+                rgba(5, 11, 22, 0.82);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
+            margin-bottom: 22px;
+        }
+
+        .hero-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.85fr);
+            gap: 26px;
+            align-items: end;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(120, 236, 255, 0.1);
+            border: 1px solid rgba(120, 236, 255, 0.18);
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+            font-size: 0.72rem;
+        }
+
+        h1 {
+            margin: 18px 0 16px;
+            font-size: clamp(3rem, 8vw, 6.2rem);
+            line-height: 0.94;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .hero-copy,
+        .hero-side p,
+        .signal p,
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .hero-side {
+            padding: 24px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-side h2,
+        .card h3 {
+            margin: 0 0 10px;
+        }
+
+        .signal-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 24px 0 8px;
+        }
+
+        .big-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 190px;
+            padding: 16px 22px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            background: linear-gradient(135deg, rgba(120, 236, 255, 0.14), rgba(122, 243, 196, 0.12));
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .big-btn.alt {
+            background: linear-gradient(135deg, rgba(255, 217, 120, 0.14), rgba(120, 236, 255, 0.12));
+        }
+
+        .signal,
+        .card {
+            padding: 20px;
+            border-radius: 24px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(12px);
+        }
+
+        .signal small,
+        .card-tag {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--mint);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 0.72rem;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            min-height: 230px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.28);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.26);
+        }
+
+        .card::after {
+            content: attr(data-mark);
+            position: absolute;
+            right: 18px;
+            bottom: 8px;
+            font-size: 4.8rem;
+            opacity: 0.08;
+            font-weight: 700;
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+        }
+
+        .logout {
+            display: inline-flex;
+            margin-top: 24px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            text-decoration: none;
+            background: rgba(255,255,255,0.03);
+        }
+
+        @media (max-width: 980px) {
+            .hero-grid,
+            .signal-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if not admin_unlocked %}
+    <div id="gate">
+        <div class="gate-box">
+            <span class="eyebrow">Protected Entry</span>
+            <h2>Admin Password</h2>
+            <p>Enter the master password to open the full admin suite.</p>
+            <input id="admin-pass" class="gate-input" type="password" placeholder="Admin password">
+            <button class="gate-btn" type="button" onclick="unlockAdmin()">Open admin</button>
+            <div id="gate-error" class="gate-error">Wrong password. Try again.</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="shell">
+        <nav class="suite-nav">
+            <a class="active" href="{{ url_for('admin_index') }}">Admin Home</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
+            <a href="{{ url_for('admin_notes') }}">Notes</a>
+            <a href="{{ url_for('admin_links') }}">Links</a>
+        </nav>
+        <section class="hero">
+            <div class="hero-grid">
+                <div>
+                    <span class="eyebrow">Master Admin Access</span>
+                    <h1>Admin Nexus</h1>
+                    <p class="hero-copy">One bigger command center for the whole site. Open kingdom control, the dashboard, notes, and links from a single bold admin landing page.</p>
+                    <div class="button-row">
+                        <a class="big-btn alt" href="{{ url_for('kingdom_admin') }}">Open Kingdom Admin</a>
+                        <a class="big-btn" href="{{ url_for('admin_dashboard') }}">Open Dashboard</a>
+                        <a class="big-btn" href="{{ url_for('admin_notes') }}">Open Notes</a>
+                    </div>
+                </div>
+                <aside class="hero-side">
+                    <h2>Ready Rooms</h2>
+                    <p>Each admin page now has a stronger control-room layout so the project feels connected instead of split across older simple pages.</p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="signal-row">
+            <div class="signal">
+                <small>Realm</small>
+                <p>Kingdom users, hero data, and account review.</p>
+            </div>
+            <div class="signal">
+                <small>Notes</small>
+                <p>Pinned plans, reminders, and saved admin notes.</p>
+            </div>
+            <div class="signal">
+                <small>Security</small>
+                <p>IP bans, kingdom bans, and live website paths.</p>
+            </div>
+            <div class="signal">
+                <small>Assets</small>
+                <p>Saved admin links and shared references.</p>
+            </div>
+        </section>
+
+        <section class="portal-grid">
+            <a class="card" href="{{ url_for('admin_dashboard') }}" data-mark="01">
+                <span class="card-tag">Security Core</span>
+                <h3>Dashboard</h3>
+                <p>Open the live dashboard for real IPs, website paths, kingdom users, and ban actions.</p>
+            </a>
+            <a class="card" href="{{ url_for('kingdom_admin') }}" data-mark="02">
+                <span class="card-tag">Realm Wing</span>
+                <h3>Kingdom Admin</h3>
+                <p>Inspect registered souls, heroes, and realm metrics in a matching kingdom control room.</p>
+            </a>
+            <a class="card" href="{{ url_for('admin_notes') }}" data-mark="03">
+                <span class="card-tag">Intel</span>
+                <h3>Notes</h3>
+                <p>Keep your admin notes, reminders, tags, and pinned tasks organized.</p>
+            </a>
+            <a class="card" href="{{ url_for('admin_links') }}" data-mark="04">
+                <span class="card-tag">Reference Deck</span>
+                <h3>Links</h3>
+                <p>Store important URLs, reference pages, and admin shortcuts in one place.</p>
+            </a>
+        </section>
+
+        <a class="logout" href="{{ url_for('admin_logout') }}">Log out</a>
+    </div>
+
+    <script>
+        const nextTarget = {{ next_target|tojson }};
+
+        async function unlockAdmin() {
+            const passInput = document.getElementById('admin-pass');
+            const errorBox = document.getElementById('gate-error');
+            if (!passInput) {
+                return;
+            }
+            const res = await fetch('/api/admin/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ password: passInput.value })
+            });
+
+            if (res.ok) {
+                sessionStorage.setItem('adminMasterPassword', passInput.value);
+                if (nextTarget) {
+                    window.location.href = nextTarget;
+                    return;
+                }
+                const gate = document.getElementById('gate');
+                if (gate) {
+                    gate.remove();
+                }
+                return;
+            }
+
+            if (errorBox) {
+                errorBox.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && document.getElementById('gate')) {
+                unlockAdmin();
+            }
+        });
+    </script>
+</body>
+</html>

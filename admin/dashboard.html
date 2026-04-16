@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --bg: #06111f;
+            --panel: rgba(9, 19, 35, 0.82);
+            --panel-strong: rgba(12, 24, 44, 0.95);
+            --line: rgba(132, 195, 255, 0.17);
+            --text: #f5f9ff;
+            --muted: #9cafcb;
+            --cyan: #7ce8ff;
+            --mint: #7bf1c3;
+            --gold: #ffd778;
+            --danger: #ff9b9b;
+            --danger-bg: rgba(255, 117, 117, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: Georgia, 'Times New Roman', serif;
+            background:
+                radial-gradient(circle at 10% 12%, rgba(124, 232, 255, 0.14), transparent 23%),
+                radial-gradient(circle at 85% 16%, rgba(255, 215, 120, 0.1), transparent 22%),
+                radial-gradient(circle at 84% 84%, rgba(123, 241, 195, 0.11), transparent 20%),
+                linear-gradient(150deg, #02050b 0%, #07111e 45%, #0b1a31 100%);
+            padding: 28px;
+        }
+
+        a { color: inherit; }
+
+        .wrap {
+            max-width: 1380px;
+            margin: 0 auto;
+        }
+
+        .suite-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .suite-nav a {
+            text-decoration: none;
+            color: var(--text);
+            padding: 11px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            font-size: 0.95rem;
+        }
+
+        .suite-nav a.active {
+            background: linear-gradient(135deg, rgba(124, 232, 255, 0.18), rgba(123, 241, 195, 0.16));
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.9fr);
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .hero-card,
+        .panel,
+        .stat,
+        .site,
+        .ban-item,
+        .user-card,
+        .quick-card {
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+        }
+
+        .hero-card {
+            padding: 30px;
+        }
+
+        .hero-card h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2.7rem, 7vw, 4.8rem);
+            line-height: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .hero-card p,
+        .panel p,
+        .site p,
+        .user-card p,
+        .ban-item p,
+        .quick-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(124, 232, 255, 0.18);
+            color: var(--cyan);
+            background: rgba(124, 232, 255, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.72rem;
+        }
+
+        .hero-side {
+            padding: 24px;
+            display: grid;
+            gap: 14px;
+            align-content: start;
+        }
+
+        .hero-side strong {
+            font-size: 1.1rem;
+        }
+
+        .back {
+            display: inline-flex;
+            width: fit-content;
+            margin-top: 8px;
+            text-decoration: none;
+            padding: 12px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            padding: 22px;
+        }
+
+        .stat small {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        .stat strong {
+            font-size: clamp(1.7rem, 5vw, 3rem);
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .action-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .action-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 18px;
+            border-radius: 16px;
+            text-decoration: none;
+            border: 1px solid var(--line);
+            color: var(--text);
+            font-weight: 700;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .quick-card {
+            padding: 22px;
+        }
+
+        .quick-card h2 {
+            margin: 0 0 10px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(330px, 0.9fr);
+            gap: 20px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 20px;
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+            font-size: 1.35rem;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .section-head h2,
+        .section-head h3 {
+            margin: 0;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 880px;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.76rem;
+        }
+
+        code {
+            color: var(--cyan);
+            font-family: Consolas, 'Courier New', monospace;
+            word-break: break-word;
+        }
+
+        .site-grid,
+        .ban-list,
+        .user-grid,
+        .ip-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .site,
+        .ban-item,
+        .user-card {
+            padding: 18px;
+        }
+
+        .site strong,
+        .user-card strong,
+        .ban-item strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.02rem;
+        }
+
+        .site a {
+            color: var(--mint);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .meta {
+            display: inline-flex;
+            margin-top: 10px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.05);
+            color: var(--muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        .inline-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .inline-form-3 {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            outline: none;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 14px;
+            color: #04111d;
+            background: var(--mint);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .danger-btn {
+            color: #fff2f2;
+            background: linear-gradient(135deg, #8e2222, #cf4444);
+        }
+
+        .ghost-btn {
+            color: var(--text);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .status {
+            display: inline-flex;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: rgba(123, 241, 195, 0.1);
+            color: var(--mint);
+        }
+
+        .status.banned {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .small-form button {
+            width: 100%;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 8px 0 4px;
+        }
+
+        @media (max-width: 1080px) {
+            .hero,
+            .layout,
+            .stats,
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero-card,
+            .hero-side,
+            .panel,
+            .stat,
+            .quick-card {
+                padding: 20px;
+            }
+
+            .inline-form {
+                grid-template-columns: 1fr;
+            }
+
+            .inline-form-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if not admin_unlocked %}
+    <div id="gate" style="position:fixed;inset:0;z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,5,13,0.94);backdrop-filter:blur(12px);">
+        <div style="width:min(460px,100%);padding:34px;border-radius:30px;border:1px solid rgba(130,203,255,0.18);background:rgba(7,14,28,0.96);box-shadow:0 24px 80px rgba(0,0,0,0.45);text-align:center;">
+            <h2 style="margin:18px 0 12px;font-size:2rem;text-transform:uppercase;letter-spacing:.04em;">Admin Password</h2>
+            <p>Enter the master password to open this admin page.</p>
+            <input id="admin-pass" type="password" placeholder="Admin password" style="width:100%;margin-top:18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font:inherit;">
+            <button type="button" onclick="unlockAdmin()" style="width:100%;margin-top:14px;padding:14px 16px;border:none;border-radius:16px;font:inherit;font-weight:700;cursor:pointer;color:#06111f;background:linear-gradient(135deg,#78ecff,#7af3c4);">Open page</button>
+            <div id="gate-error" style="display:none;margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,121,152,0.14);border:1px solid rgba(255,121,152,0.25);color:#ffd4de;">Wrong password. Try again.</div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="wrap"{% if not admin_unlocked %} style="display:none;"{% endif %}>
+        <nav class="suite-nav">
+            <a href="{{ url_for('admin_index') }}">Admin Home</a>
+            <a class="active" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
+            <a href="{{ url_for('admin_notes') }}">Notes</a>
+            <a href="{{ url_for('admin_links') }}">Links</a>
+        </nav>
+        <section class="hero">
+            <div class="hero-card">
+                <span class="eyebrow">Live Control</span>
+                <h1>Admin Dashboard</h1>
+                <p>Professional security dashboard for the admin suite with visible control buttons, live IP activity, kingdom-user actions, and direct navigation to every admin section.</p>
+                <a class="back" href="{{ url_for('admin_index') }}">Back to admin home</a>
+                <div class="action-strip">
+                    <a class="action-link" href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
+                    <a class="action-link" href="#quick-ban">Quick Ban Tools</a>
+                </div>
+            </div>
+            <aside class="hero-side panel">
+                <strong>Fast actions</strong>
+                <p>Ban a kingdom user, ban a website IP, inspect recent IP traffic, and use the activity table to block visitors directly from a row.</p>
+            </aside>
+        </section>
+
+        <section class="stats">
+            <div class="stat">
+                <small>Total Kingdom Users</small>
+                <strong>{{ stats.total_users }}</strong>
+            </div>
+            <div class="stat">
+                <small>Total Visits Logged</small>
+                <strong>{{ stats.total_visits }}</strong>
+            </div>
+            <div class="stat">
+                <small>Unique IPs</small>
+                <strong>{{ stats.unique_ips }}</strong>
+            </div>
+            <div class="stat">
+                <small>Banned IPs</small>
+                <strong>{{ stats.banned_ips|length }}</strong>
+            </div>
+            <div class="stat">
+                <small>Banned Users</small>
+                <strong>{{ stats.banned_users|length }}</strong>
+            </div>
+        </section>
+
+        <section class="quick-grid" id="quick-ban">
+            <div class="quick-card">
+                <h2>Quick Ban IP</h2>
+                <p>Enter any visitor IP and block it from the website.</p>
+                <form method="post" action="{{ url_for('admin_dashboard') }}" class="inline-form">
+                    <input type="text" name="ip" placeholder="127.0.0.1" required>
+                    <input type="hidden" name="action" value="ban-ip">
+                    <button type="submit" class="danger-btn">Ban IP</button>
+                </form>
+            </div>
+            <div class="quick-card">
+                <h2>Quick Ban Kingdom User</h2>
+                <p>Type a kingdom username and ban that account immediately.</p>
+                <form method="post" action="{{ url_for('admin_dashboard') }}" class="inline-form">
+                    <input type="text" name="username" placeholder="kingdom username" required>
+                    <input type="hidden" name="action" value="ban-user">
+                    <button type="submit" class="danger-btn">Ban User</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="panel" style="margin-bottom: 20px;">
+            <h2>Fast Ban Buttons</h2>
+            <p>Visible dashboard buttons for banning an IP or kingdom user right from the top area.</p>
+            <form method="post" action="{{ url_for('admin_dashboard') }}" class="inline-form-3">
+                <input type="text" name="ip" placeholder="IP to ban">
+                <input type="hidden" name="action" value="ban-ip">
+                <button type="submit" class="danger-btn">Ban IP Now</button>
+            </form>
+            <form method="post" action="{{ url_for('admin_dashboard') }}" class="inline-form-3">
+                <input type="text" name="username" placeholder="Kingdom user to ban">
+                <input type="hidden" name="action" value="ban-user">
+                <button type="submit" class="danger-btn">Ban User Now</button>
+            </form>
+        </section>
+
+        <section class="layout">
+            <div class="stack">
+                <div class="panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>Recent Activity With IP</h2>
+                            <p>Every row shows the visitor IP, and each row can ban that IP directly.</p>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Path</th>
+                                    <th>IP</th>
+                                    <th>Ban IP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in stats.logs %}
+                                <tr>
+                                    <td>{{ log.timestamp or '-' }}</td>
+                                    <td>{{ log.user or 'Guest' }}</td>
+                                    <td><code>{{ log.path or '/' }}</code></td>
+                                    <td><code>{{ log.ip or 'Unknown' }}</code></td>
+                                    <td>
+                                        {% if log.ip %}
+                                        <form method="post" action="{{ url_for('admin_dashboard') }}" class="small-form">
+                                            <input type="hidden" name="action" value="ban-ip">
+                                            <input type="hidden" name="ip" value="{{ log.ip }}">
+                                            <button type="submit" class="danger-btn">Ban {{ log.ip }}</button>
+                                        </form>
+                                        {% else %}
+                                        <span class="empty">No IP</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="empty">No traffic logged yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>Kingdom Users</h2>
+                            <p>Ban or unban real kingdom accounts from here.</p>
+                        </div>
+                    </div>
+                    <div class="user-grid">
+                        {% for user in stats.kingdom_users %}
+                        <article class="user-card">
+                            <strong>{{ user.username }}</strong>
+                            <p>{{ user.email }}</p>
+                            <p>Hero: {{ user.hero_name }}</p>
+                            <p>Ban control for kingdom user is below.</p>
+                            <span class="status{% if user.is_banned %} banned{% endif %}">{% if user.is_banned %}Banned{% else %}Active{% endif %}</span>
+                            <div class="row-actions">
+                                {% if user.is_banned %}
+                                <form method="post" action="{{ url_for('admin_dashboard') }}">
+                                    <input type="hidden" name="action" value="unban-user">
+                                    <input type="hidden" name="username" value="{{ user.username }}">
+                                    <button type="submit" class="ghost-btn">Unban user</button>
+                                </form>
+                                {% else %}
+                                <form method="post" action="{{ url_for('admin_dashboard') }}">
+                                    <input type="hidden" name="action" value="ban-user">
+                                    <input type="hidden" name="username" value="{{ user.username }}">
+                                    <button type="submit" class="danger-btn">Ban kingdom user</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </article>
+                        {% else %}
+                        <div class="empty">No kingdom users found.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>Real Website Paths</h2>
+                            <p>These links come from real traffic logs and open the actual website page.</p>
+                        </div>
+                    </div>
+                    <div class="site-grid">
+                        {% for site in stats.websites %}
+                        <article class="site">
+                            <strong><code>{{ site.path }}</code></strong>
+                            <p><a href="{{ site.url }}" target="_blank" rel="noreferrer">{{ site.url }}</a></p>
+                            <span class="meta">{{ site.visits }} visits</span>
+                        </article>
+                        {% else %}
+                        <div class="empty">No website visits logged yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack">
+                <div class="panel">
+                    <h2>IP Monitor</h2>
+                    <p>This section shows the visitor IPs seen by the dashboard logs.</p>
+                    <div class="ip-grid">
+                        {% for item in stats.recent_ips %}
+                        <article class="ban-item">
+                            <strong><code>{{ item.ip }}</code></strong>
+                            <p>{{ item.visits }} visits recorded from this IP.</p>
+                            <div class="row-actions">
+                                <form method="post" action="{{ url_for('admin_dashboard') }}">
+                                    <input type="hidden" name="action" value="ban-ip">
+                                    <input type="hidden" name="ip" value="{{ item.ip }}">
+                                    <button type="submit" class="danger-btn">Ban this IP</button>
+                                </form>
+                            </div>
+                        </article>
+                        {% else %}
+                        <div class="empty">No IP activity yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Banned IPs</h2>
+                    <div class="ban-list">
+                        {% for ip in stats.banned_ips %}
+                        <article class="ban-item">
+                            <strong><code>{{ ip }}</code></strong>
+                            <p>This IP is blocked from opening the website.</p>
+                            <div class="row-actions">
+                                <form method="post" action="{{ url_for('admin_dashboard') }}">
+                                    <input type="hidden" name="action" value="unban-ip">
+                                    <input type="hidden" name="ip" value="{{ ip }}">
+                                    <button type="submit" class="ghost-btn">Unban IP</button>
+                                </form>
+                            </div>
+                        </article>
+                        {% else %}
+                        <div class="empty">No banned IP addresses.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Banned Kingdom Users</h2>
+                    <div class="ban-list">
+                        {% for user in stats.banned_users %}
+                        <article class="ban-item">
+                            <strong>{{ user }}</strong>
+                            <p>This kingdom account will be forced out on the next request.</p>
+                            <div class="row-actions">
+                                <form method="post" action="{{ url_for('admin_dashboard') }}">
+                                    <input type="hidden" name="action" value="unban-user">
+                                    <input type="hidden" name="username" value="{{ user }}">
+                                    <button type="submit" class="ghost-btn">Unban user</button>
+                                </form>
+                            </div>
+                        </article>
+                        {% else %}
+                        <div class="empty">No banned users.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script>
+        const nextTarget = {{ next_target|tojson }};
+
+        async function unlockAdmin() {
+            const passInput = document.getElementById('admin-pass');
+            const errorBox = document.getElementById('gate-error');
+            if (!passInput) return;
+            const res = await fetch('/api/admin/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ password: passInput.value })
+            });
+            if (res.ok) {
+                window.location.href = nextTarget || '/admin';
+                return;
+            }
+            if (errorBox) errorBox.style.display = 'block';
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && document.getElementById('gate')) unlockAdmin();
+        });
+
+        if (document.getElementById('gate')) {
+            const savedPassword = sessionStorage.getItem('adminMasterPassword');
+            const passInput = document.getElementById('admin-pass');
+            if (savedPassword && passInput) {
+                passInput.value = savedPassword;
+                unlockAdmin();
+            }
+        }
+    </script>
+</body>
+</html>

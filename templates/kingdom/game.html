@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Battles | COMING SOON</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #0a0a1a 0%, #000000 70%);
+            font-family: 'Orbitron', monospace;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        .coming-soon {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 
+                0 0 10px #ffd700,
+                0 0 20px #ff1493,
+                0 0 30px #00ffff,
+                0 0 40px #ffd700;
+            animation: glow 2s ease-in-out infinite alternate;
+            font-size: clamp(4rem, 12vw, 20rem);
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            transform: perspective(1000px) rotateX(10deg);
+            cursor: default;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 
+                    0 0 10px #ffd700,
+                    0 0 20px #ff1493,
+                    0 0 30px #00ffff,
+                    0 0 50px #ffd700,
+                    0 0 60px #ff1493;
+                transform: perspective(1000px) rotateX(10deg) translateY(0);
+            }
+            to {
+                text-shadow: 
+                    0 0 20px #ffd700,
+                    0 0 30px #ff1493,
+                    0 0 50px #00ffff,
+                    0 0 70px #ffd700,
+                    0 0 100px #ff1493;
+                transform: perspective(1000px) rotateX(20deg) translateY(-10px);
+            }
+        }
+        
+        .subtitle {
+            margin-top: 2rem;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            animation: pulse 1.5s ease-in-out infinite;
+            opacity: 0;
+            animation-delay: 1s;
+            animation-fill-mode: forwards;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        .glitch {
+            position: relative;
+            animation: glitch 0.3s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .coming-soon {
+                letter-spacing: 0.05em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    <div class="coming-soon glitch">
+        COMING SOON
+        <div class="subtitle">Kingdom Battles Await</div>
+    </div>
+    
+    <script>
+        // Ultra-cool particle system for insane artist-level effects
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = `hsl(${Math.random() * 60 + 240}, 100%, ${Math.random() * 50 + 50}%)`; // Cyan-gold tones
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.glow = Math.random() * 10 + 5;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+                
+                this.opacity = Math.sin(Date.now() * 0.001 + this.x * 0.01) * 0.3 + 0.7;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = this.glow;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        const particles = [];
+        for (let i = 0; i < 200; i++) {
+            particles.push(new Particle());
+        }
+        
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 10, 26, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            // Mouse trail magic
+            canvas.addEventListener('mousemove', (e) => {
+                for (let i = 0; i < 5; i++) {
+                    const p = new Particle();
+                    p.x = e.clientX;
+                    p.y = e.clientY;
+                    p.color = '#ffd700';
+                    p.size *= 2;
+                    p.speedX *= 3;
+                    p.speedY *= 3;
+                    particles.push(p);
+                }
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // Epic entrance animation
+        document.querySelector('.coming-soon').style.opacity = '0';
+        document.querySelector('.coming-soon').style.transform = 'scale(0.5) rotateY(90deg)';
+        setTimeout(() => {
+            document.querySelector('.coming-soon').style.transition = 'all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            document.querySelector('.coming-soon').style.opacity = '1';
+            document.querySelector('.coming-soon').style.transform = 'scale(1) rotateY(0deg)';
+        }, 500);
+    </script>
+</body>
+</html>

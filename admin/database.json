@@ -1,0 +1,141 @@
+{
+    "links": [],
+    "notes": [
+        {
+            "id": "1776030485159",
+            "title": "Smoke Note",
+            "content": "saved",
+            "category": "General",
+            "color": "aurora",
+            "tags": [
+                "x",
+                "y"
+            ],
+            "checklist": [
+                "task 1",
+                "task 2"
+            ],
+            "reminder": "",
+            "is_pinned": false,
+            "is_favorite": false,
+            "is_archived": false,
+            "created_at": "2026-04-12T21:48:05.159458+00:00",
+            "updated_at": "2026-04-12T21:48:05.159458+00:00"
+        },
+        {
+            "id": "1776030454860",
+            "title": "Test note",
+            "content": "Body",
+            "category": "General",
+            "color": "aurora",
+            "tags": [
+                "one",
+                "two"
+            ],
+            "checklist": [
+                "a",
+                "b"
+            ],
+            "reminder": "",
+            "is_pinned": true,
+            "is_favorite": false,
+            "is_archived": false,
+            "created_at": "2026-04-12T21:47:34.860218+00:00",
+            "updated_at": "2026-04-12T21:47:34.860218+00:00"
+        }
+    ],
+    "banned_ips": [],
+    "banned_users": [],
+    "logs": [
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-12T16:46:10.374623+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-12T16:46:28.926435+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-12T16:48:29.986092+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-12T21:47:34.835748+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-12T21:47:34.985888+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/files",
+            "timestamp": "2026-04-12T21:47:36.465211+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-12T21:48:05.088211+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/links",
+            "timestamp": "2026-04-12T22:19:29.824637+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/files",
+            "timestamp": "2026-04-12T22:19:30.395596+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/admin/verify",
+            "timestamp": "2026-04-13T18:47:12.349904+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/school/data",
+            "timestamp": "2026-04-13T18:47:12.479499+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/school/update",
+            "timestamp": "2026-04-13T18:47:12.677396+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/school/update",
+            "timestamp": "2026-04-13T18:58:35.254064+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/admin/verify",
+            "timestamp": "2026-04-13T18:58:35.304184+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/school/update",
+            "timestamp": "2026-04-13T18:58:35.616873+00:00",
+            "user": "Guest"
+        }
+    ]
+}

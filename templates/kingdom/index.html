@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kingdom | Entry Gate</title>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+    ></script>
+    <style>
+      :root {
+        --bg-1: #090f1c;
+        --bg-2: #13233d;
+        --bg-3: #201328;
+        --panel: rgba(8, 13, 24, 0.88);
+        --line: rgba(255, 230, 178, 0.16);
+        --line-strong: rgba(132, 214, 255, 0.28);
+        --text: #f6f4ed;
+        --muted: #aeb8c9;
+        --ice: #8deaff;
+        --gold: #f5c46a;
+        --danger: #ff9292;
+        --success: #9effc6;
+        --shadow: 0 36px 100px rgba(0, 0, 0, 0.48);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Georgia, "Trebuchet MS", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(141, 234, 255, 0.18), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(245, 196, 106, 0.14), transparent 26%),
+          linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 52%, var(--bg-3) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 18px;
+        overflow-x: hidden;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        border-radius: 999px;
+        pointer-events: none;
+        filter: blur(18px);
+        opacity: 0.55;
+      }
+
+      body::before {
+        width: 240px;
+        height: 240px;
+        top: 7%;
+        left: -90px;
+        background: rgba(71, 207, 255, 0.12);
+        animation: drift 11s ease-in-out infinite;
+      }
+
+      body::after {
+        width: 340px;
+        height: 340px;
+        right: -110px;
+        bottom: -40px;
+        background: rgba(245, 196, 106, 0.1);
+        animation: drift 13s ease-in-out infinite reverse;
+      }
+
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-24px) scale(1.04);
+        }
+      }
+
+      .topbar {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        z-index: 5;
+      }
+
+      .user-pill,
+      .logout-btn {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(8, 13, 24, 0.78);
+        backdrop-filter: blur(12px);
+        color: var(--text);
+        font-size: 0.82rem;
+        letter-spacing: 0.05em;
+      }
+
+      .user-pill {
+        padding: 10px 14px;
+      }
+
+      .logout-btn {
+        padding: 10px 16px;
+        cursor: pointer;
+        text-transform: uppercase;
+      }
+
+      .shell {
+        width: min(1120px, 100%);
+        display: grid;
+        grid-template-columns: 1.12fr 0.88fr;
+        border-radius: 34px;
+        overflow: hidden;
+        background: rgba(6, 10, 20, 0.58);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .page-panel {
+        width: min(1120px, 100%);
+        border-radius: 34px;
+        overflow: hidden;
+        background: rgba(6, 10, 20, 0.58);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .load-stage {
+        min-height: 720px;
+        padding: 56px 46px;
+        position: relative;
+        background:
+          radial-gradient(circle at top, rgba(141, 234, 255, 0.12), transparent 32%),
+          radial-gradient(circle at bottom right, rgba(245, 196, 106, 0.12), transparent 24%),
+          linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .load-stage::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 1px solid rgba(245, 196, 106, 0.12);
+        border-radius: 26px;
+        pointer-events: none;
+      }
+
+      .load-copy {
+        position: relative;
+        z-index: 1;
+      }
+
+      .load-copy h1 {
+        margin: 18px 0 14px;
+        max-width: 720px;
+        font-size: clamp(3rem, 7vw, 6rem);
+        line-height: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .load-copy p {
+        max-width: 620px;
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 1.04rem;
+      }
+
+      .load-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .load-card {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .load-card strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--gold);
+        font-size: 1.2rem;
+      }
+
+      .load-card span {
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      .load-actions {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 28px;
+      }
+
+      .btn-secondary {
+        width: auto;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: none;
+      }
+
+      .hero-panel {
+        padding: 54px 46px;
+        min-height: 720px;
+        background:
+          linear-gradient(180deg, rgba(141, 234, 255, 0.06), transparent 38%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+        position: relative;
+      }
+
+      .hero-panel::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 1px solid rgba(245, 196, 106, 0.1);
+        border-radius: 26px;
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--ice);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.26em;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 36px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--ice));
+      }
+
+      .hero-panel h1 {
+        margin: 18px 0 16px;
+        max-width: 620px;
+        font-size: clamp(2.9rem, 6vw, 5.4rem);
+        line-height: 0.92;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .hero-panel p {
+        max-width: 520px;
+        color: var(--muted);
+        font-size: 1.02rem;
+        line-height: 1.75;
+        margin: 0;
+      }
+
+      .crest-strip {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 24px 0 32px;
+      }
+
+      .crest {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #dfe7f5;
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 34px;
+      }
+
+      .hero-stat,
+      .lore-card {
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .hero-stat {
+        padding: 18px;
+      }
+
+      .hero-stat strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 1.55rem;
+        color: var(--gold);
+      }
+
+      .hero-stat span {
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .lore-card {
+        margin-top: 24px;
+        padding: 24px;
+        background:
+          linear-gradient(135deg, rgba(245, 196, 106, 0.08), rgba(141, 234, 255, 0.05));
+      }
+
+      .lore-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .lore-card p {
+        max-width: none;
+        font-size: 0.96rem;
+      }
+
+      .auth-panel {
+        padding: 40px 34px;
+        background: var(--panel);
+        border-left: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .auth-card {
+        width: 100%;
+        max-width: 410px;
+      }
+
+      .auth-frame {
+        padding: 28px;
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+        border: 1px solid var(--line);
+      }
+
+      .auth-card h2 {
+        margin: 0;
+        font-size: 2.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .subcopy {
+        margin: 10px 0 24px;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 0.95rem;
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #d7deec;
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+      }
+
+      .field input {
+        width: 100%;
+        padding: 15px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(2, 6, 14, 0.72);
+        color: var(--text);
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+      }
+
+      .field input:focus {
+        border-color: var(--line-strong);
+        box-shadow: 0 0 0 4px rgba(71, 207, 255, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .signup-only {
+        display: none;
+      }
+
+      .status-box {
+        min-height: 58px;
+        margin: 10px 0 18px;
+        padding: 15px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .status-box.success {
+        color: var(--success);
+        border-color: rgba(158, 255, 198, 0.24);
+        background: rgba(158, 255, 198, 0.08);
+      }
+
+      .status-box.error {
+        color: var(--danger);
+        border-color: rgba(255, 146, 146, 0.24);
+        background: rgba(255, 146, 146, 0.08);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 16px 18px;
+        border: none;
+        border-radius: 18px;
+        cursor: pointer;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
+      }
+
+      .btn-primary {
+        color: #081019;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--ice) 100%);
+        box-shadow: 0 18px 40px rgba(71, 207, 255, 0.2);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 44px rgba(71, 207, 255, 0.28);
+      }
+
+      .btn:disabled {
+        opacity: 0.62;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .toggle-link {
+        margin-top: 16px;
+        text-align: center;
+        color: #d2dae6;
+        cursor: pointer;
+        font-size: 0.88rem;
+        text-decoration: underline;
+        text-decoration-color: rgba(210, 218, 230, 0.4);
+        text-underline-offset: 4px;
+      }
+
+      .toggle-link:hover {
+        color: var(--ice);
+      }
+
+      @media (max-width: 940px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+
+        .load-stage {
+          min-height: auto;
+          padding: 42px 26px 30px;
+        }
+
+        .load-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-panel {
+          min-height: auto;
+          padding: 42px 26px 30px;
+        }
+
+        .auth-panel {
+          padding: 30px 20px 34px;
+          border-left: none;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 520px) {
+        body {
+          padding: 18px 12px;
+        }
+
+        .topbar {
+          position: static;
+          margin-bottom: 12px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .hero-panel h1 {
+          font-size: 2.55rem;
+        }
+
+        .hero-panel,
+        .auth-panel,
+        .load-stage {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+
+        .auth-frame {
+          padding: 22px 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="user-pill">
+        {% if kingdom_username %}User: {{ kingdom_username }}{% else %}User: Guest{% endif %}
+      </div>
+      {% if kingdom_username %}
+      <form method="post" action="/kingdom/logout">
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="page-panel" id="load-screen">
+      <section class="load-stage">
+        <div class="load-copy">
+          <div class="eyebrow">Step 1 - Kingdom Gate</div>
+          <h1>Enter The Kingdom</h1>
+          <p>
+            The outer gate opens the path into the realm. Cross this first checkpoint, then enter
+            the registry chamber to send your royal code.
+          </p>
+
+          <div class="load-grid">
+            <div class="load-card">
+              <strong>01</strong>
+              <span>Pass through the outer gate.</span>
+            </div>
+            <div class="load-card">
+              <strong>02</strong>
+              <span>Register your name and send the code.</span>
+            </div>
+            <div class="load-card">
+              <strong>03</strong>
+              <span>Present the code in the verification chamber.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="load-actions">
+          <button class="btn btn-primary" type="button" onclick="showAuthScreen(false)">Enter Registry Chamber</button>
+          <button class="btn btn-secondary" type="button" onclick="showAuthScreen(true)">Return As Adventurer</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="shell hidden" id="auth-screen" data-auth-mode="{{ auth_mode or 'signup' }}">
+      <section class="hero-panel">
+        <div class="eyebrow">Step 1 - Registry Chamber</div>
+        <h1>Bind Your Name To The Realm</h1>
+        <p>
+          Enter your details, claim your place in the kingdom, and send the six-digit code to your royal email.
+        </p>
+
+        <div class="crest-strip">
+          <div class="crest">Registry</div>
+          <div class="crest">Seal Code</div>
+          <div class="crest">Verification</div>
+        </div>
+
+        <div class="hero-grid">
+          <div class="hero-stat">
+            <strong>01</strong>
+            <span>Register a new name or return to your account.</span>
+          </div>
+          <div class="hero-stat">
+            <strong>02</strong>
+            <span>Receive the six-digit code.</span>
+          </div>
+          <div class="hero-stat">
+            <strong>03</strong>
+            <span>Advance to the verification chamber.</span>
+          </div>
+        </div>
+
+        <div class="lore-card">
+          <h3>Kingdom Path</h3>
+          <p>
+            Gate first. Registry second. Verification next. The forge and frontier wait beyond the code.
+          </p>
+        </div>
+      </section>
+
+      <section class="auth-panel">
+        <div class="auth-card">
+          <div class="auth-frame">
+            <h2 id="form-title">Signup</h2>
+            <p class="subcopy" id="form-copy">
+              Record your kingdom details and send the code before entering the verification chamber.
+            </p>
+
+            <div class="field">
+              <label for="username">Identity</label>
+              <input type="text" id="username" placeholder="Username" />
+            </div>
+
+            <div class="field signup-only">
+              <label for="email">Royal Email</label>
+              <input type="email" id="email" placeholder="name@example.com" />
+            </div>
+
+            <div class="field signup-only">
+              <label for="birthdate">Birthdate</label>
+              <input type="date" id="birthdate" />
+            </div>
+
+            <div class="field">
+              <label for="password">Secret Passcode</label>
+              <input type="password" id="password" placeholder="Password" />
+            </div>
+
+            <div id="status-box" class="status-box">
+              Send the code from here, then continue to the verification chamber.
+            </div>
+
+            <button class="btn btn-primary" id="action-btn" onclick="handleAuth()">
+              Send Code
+            </button>
+            <button class="btn btn-secondary" type="button" style="margin-top:12px;" onclick="showLoadScreen()">
+              Return To Gate
+            </button>
+            <p class="toggle-link" id="toggle-text" onclick="toggleMode()">
+              Already have a Soul? Login
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const EMAILJS_PUBLIC_KEY = "S-tawjvA5mozda0-4";
+      const EMAILJS_SERVICE_ID = "service_izmmagj";
+      const EMAILJS_TEMPLATE_ID = "template_lbv8aqb";
+
+      const emailClient = window.emailjs || null;
+
+      if (emailClient) {
+          emailClient.init({
+              publicKey: EMAILJS_PUBLIC_KEY
+          });
+      }
+
+      const shellElement = document.getElementById('auth-screen');
+      let isLogin = shellElement.dataset.authMode === 'login';
+
+      function showLoadScreen() {
+          document.getElementById('load-screen').classList.remove('hidden');
+          document.getElementById('auth-screen').classList.add('hidden');
+      }
+
+      function showAuthScreen(loginMode = false) {
+          isLogin = loginMode;
+          document.getElementById('load-screen').classList.add('hidden');
+          document.getElementById('auth-screen').classList.remove('hidden');
+          updateMode();
+      }
+
+      function setStatus(message, type = '') {
+          const box = document.getElementById('status-box');
+          box.textContent = message;
+          box.className = 'status-box';
+          if (type) {
+              box.classList.add(type);
+          }
+      }
+
+      function setLoadingState(isLoading) {
+          const actionBtn = document.getElementById('action-btn');
+          actionBtn.disabled = isLoading;
+          actionBtn.textContent = isLoading
+              ? (isLogin ? 'Entering...' : 'Sending...')
+              : (isLogin ? 'Enter Realm' : 'Send Code');
+      }
+
+      function toggleMode() {
+          isLogin = !isLogin;
+          updateMode();
+      }
+
+      function updateMode() {
+          document.getElementById('form-title').innerText = isLogin ? "Login" : "Signup";
+          document.getElementById('form-copy').innerText = isLogin
+              ? "Use your username or email plus password to continue into the kingdom."
+              : "Record your kingdom details and send the code before entering the verification chamber.";
+          document.getElementById('action-btn').innerText = isLogin ? "Enter Realm" : "Send Code";
+          document.getElementById('toggle-text').innerText = isLogin ? "New Soul? Create Account" : "Already have a Soul? Login";
+          document.querySelectorAll('.signup-only').forEach((item) => {
+              item.style.display = isLogin ? "none" : "block";
+          });
+          document.getElementById('username').placeholder = isLogin ? "Username or Email" : "Username";
+          setStatus(
+              isLogin
+                  ? "Verified users can sign in directly."
+                  : "Prepare your record and send the six-digit code.",
+              ''
+          );
+      }
+
+      async function sendVerificationEmail({ email, username, otp }) {
+          if (!emailClient) {
+              throw new Error("Email service is unavailable right now. Please try again in a moment.");
+          }
+
+          return emailClient.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+              passcode: otp,
+              email: email
+          });
+      }
+
+      async function handleLogin({ username, password }) {
+          const response = await fetch('/api/kingdom/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+              throw new Error(data.message || "Authentication failed.");
+          }
+
+          localStorage.setItem('activeUser', data.username || username);
+          window.location.href = "/kingdom/character";
+      }
+
+      async function handleSignup({ username, email, birthdate, password }) {
+          const response = await fetch('/api/kingdom/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, email, birthdate, password })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+              throw new Error(data.message || "Registration failed.");
+          }
+
+          localStorage.setItem('tempUser', username);
+          localStorage.setItem('tempEmail', email);
+          localStorage.setItem('tempBirth', birthdate);
+          localStorage.setItem('tempPass', password);
+          localStorage.setItem('kingdomPendingVerification', JSON.stringify({
+              username,
+              email,
+              birthdate,
+              requestedAt: new Date().toISOString()
+          }));
+
+          setStatus(`Pending signup saved for ${email}. Sending code now...`, '');
+
+          try {
+              await sendVerificationEmail({
+                  email,
+                  username,
+                  otp: data.otp
+              });
+          } catch (emailError) {
+              await fetch('/api/kingdom/resend-code', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email })
+              }).catch(() => null);
+              throw emailError;
+          }
+
+          setStatus("Code sent. Opening the verification chamber...", 'success');
+          window.location.href = "/kingdom/verify";
+      }
+
+      async function handleAuth() {
+          const username = document.getElementById('username').value.trim();
+          const email = document.getElementById('email').value.trim().toLowerCase();
+          const birthdate = document.getElementById('birthdate').value;
+          const password = document.getElementById('password').value.trim();
+
+          if (!username || !password || (!isLogin && (!email || !birthdate))) {
+              setStatus("Fill in all required fields first.", 'error');
+              return;
+          }
+
+          if (!isLogin && birthdate) {
+              const bdayObj = new Date(birthdate);
+              const today = new Date();
+              let age = today.getFullYear() - bdayObj.getFullYear();
+              const m = today.getMonth() - bdayObj.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < bdayObj.getDate())) age--;
+              if (age < 9) {
+                  setStatus("The Oracle requires you to be at least 9 years old to join.", 'error');
+                  setLoadingState(false);
+                  return;
+              }
+          }
+
+          setLoadingState(true);
+          setStatus(isLogin ? "Checking your kingdom credentials..." : "Creating your record and preparing the code...", '');
+
+          try {
+              if (isLogin) {
+                  await handleLogin({ username, password });
+                  return;
+              }
+
+              await handleSignup({ username, email, birthdate, password });
+          } catch (err) {
+              console.error(err);
+              setStatus(err.message || "Connection failed. Ensure main.py is running.", 'error');
+          } finally {
+              setLoadingState(false);
+          }
+      }
+
+      if (isLogin) {
+          showAuthScreen(true);
+      } else {
+          showLoadScreen();
+      }
+    </script>
+  </body>
+</html>

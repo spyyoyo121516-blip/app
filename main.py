@@ -1,23 +1,15 @@
 from collections import Counter
 from datetime import datetime, timedelta, timezone
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, Response, abort
+from functools import wraps
 import json
 import os
 import random
-from functools import wraps
-from andulisia import andulisia_bp
+
+from flask import Flask, Response, abort, jsonify, redirect, render_template, request, session, url_for
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Database Paths
-SCHOOL_DB = os.environ.get(
-    'SCHOOL_DB_PATH',
-    os.path.join(BASE_DIR, 'templates', 'school', 'database.json'),
-)
-EMAIL_DB = os.environ.get(
-    'EMAIL_DB_PATH',
-    os.path.join(BASE_DIR, 'templates', 'emails', 'database.json'),
-)
 KINGDOM_DB = os.environ.get(
     'KINGDOM_DB_PATH',
     os.path.join(BASE_DIR, 'templates', 'kingdom', 'database.json'),
@@ -29,23 +21,10 @@ ADMIN_DB = os.environ.get(
 
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-school-admin-change-me')
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-admin-change-me')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
-app.register_blueprint(andulisia_bp, url_prefix='/andulisa')
 MASTER_ADMIN_PASS = "XyZ9#kP2$mQv8L3wR5tN7bJ!"
-
-EMAIL_ADMIN_PASS = "spyyoyo" 
-EMAIL_CREDITS = 500  
-DEFAULT_KINGDOM_DB = {
-    "users": [],
-    "heroes": {},
-    "pending_verifications": [],
-    "logs": [],
-}
-DEFAULT_EMAIL_DB = {
-    "accounts": [],
-}
 
 def empty_kingdom_db():
     return {
@@ -55,18 +34,6 @@ def empty_kingdom_db():
         "battles": [],
         "pending_verifications": [],
         "logs": [],
-    }
-
-def empty_email_db():
-    return {
-        "accounts": [],
-    }
-
-def empty_school_db():
-    return {
-        "news": {},
-        "exams": [],
-        "timetables": {},
     }
 
 def empty_admin_db():
@@ -79,12 +46,8 @@ def empty_admin_db():
     }
 
 def default_db_for(path):
-    if path == SCHOOL_DB:
-        return empty_school_db()
     if path == KINGDOM_DB:
         return empty_kingdom_db()
-    if path == EMAIL_DB:
-        return empty_email_db()
     if path == ADMIN_DB:
         return empty_admin_db()
     return {}
@@ -117,7 +80,7 @@ def ensure_db_file(path):
 
 def init_dbs():
     """Initializes JSON databases if they don't exist."""
-    for path in (SCHOOL_DB, EMAIL_DB, KINGDOM_DB, ADMIN_DB):
+    for path in (KINGDOM_DB, ADMIN_DB):
         ensure_db_file(path)
 
 def get_db(path):
@@ -137,12 +100,6 @@ def get_db(path):
         data.setdefault("battles", [])
         data.setdefault("pending_verifications", [])
         data.setdefault("logs", [])
-    elif path == SCHOOL_DB:
-        data.setdefault("news", {})
-        data.setdefault("exams", [])
-        data.setdefault("timetables", {})
-    elif path == EMAIL_DB:
-        data.setdefault("accounts", [])
     elif path == ADMIN_DB:
         data.setdefault("links", [])
         data.setdefault("notes", [])
@@ -180,9 +137,6 @@ def get_kingdom_db():
     db.setdefault("pending_verifications", [])
     db.setdefault("logs", [])
     return db
-
-def get_email_db():
-    return get_db(EMAIL_DB)
 
 def parse_note_tags(raw_value):
     return [tag.strip() for tag in (raw_value or '').split(',') if tag.strip()]
@@ -250,16 +204,6 @@ def note_matches_filters(note, query, status_filter, category_filter):
 
     return True
 
-def find_email_account(username):
-    normalized_username = normalize_username(username)
-    if not normalized_username:
-        return None
-    db = get_email_db()
-    for account in db.get('accounts', []):
-        if normalize_username(account.get('username')).lower() == normalized_username.lower():
-            return account
-    return None
-
 def generate_otp():
     return f"{random.randint(100000, 999999)}"
 
@@ -317,6 +261,9 @@ def get_logged_in_kingdom_user():
     if not username:
         return None
     return find_kingdom_user(username)
+
+def kingdom_authenticated_redirect():
+    return redirect(url_for('kingdom_character'))
 
 @app.context_processor
 def inject_kingdom_auth():
@@ -389,8 +336,7 @@ def robots():
 def sitemap():
     """Provides a map of all important pages to Google."""
     pages = [
-        '/', '/emails', '/kingdom', '/school', '/andulisa',
-        '/school/exams', '/school/timetables'
+        '/', '/kingdom'
     ]
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -411,34 +357,6 @@ def page_not_found(error):
         return redirect(request.path[:-1])
 
     return redirect('/')
-
-
-@app.route('/school')
-def school():
-    return render_template('school/index.html')
-
-
-
-@app.route('/school/exams')
-def exams_page():
-    data = get_db(SCHOOL_DB)
-    return render_template('school/exams.html', exams=data.get('exams', []))
-
-
-@app.route('/school/admin')
-def schooladmin():
-    admin_unlocked = bool(session.get('master_admin'))
-    return render_template(
-        'school/admin.html',
-        data=get_db(SCHOOL_DB) if admin_unlocked else empty_school_db(),
-        admin_unlocked=admin_unlocked,
-        next_target=request.path,
-    )
-
-
-@app.route('/school/timetables')
-def timetables_page():
-    return render_template('school/timetables.html')
 
 
 @app.route('/')
@@ -653,49 +571,16 @@ def admin_links():
         next_target=request.path,
     )
 
-@app.route('/admin/files', methods=['GET', 'POST'])
-def admin_files():
-    if request.method == 'POST' and not session.get('master_admin'):
-        return redirect(url_for('admin_index', next=request.path))
-
-    admin_unlocked = bool(session.get('master_admin'))
-    upload_path = os.path.join(BASE_DIR, 'static', 'uploads')
-    os.makedirs(upload_path, exist_ok=True)
-    
-    if request.method == 'POST':
-        if 'file' in request.files:
-            file = request.files['file']
-            if file.filename:
-                file.save(os.path.join(upload_path, file.filename))
-        elif 'delete' in request.form:
-            filename = request.form.get('delete')
-            try:
-                os.remove(os.path.join(upload_path, filename))
-            except OSError:
-                pass
-    
-    files = os.listdir(upload_path) if admin_unlocked else []
-    return render_template(
-        'admin/files.html',
-        files=files,
-        admin_unlocked=admin_unlocked,
-        next_target=request.path,
-    )
-
 @app.route('/admin/logout')
 def admin_logout():
     session.pop('master_admin', None)
     return redirect(url_for('index'))
 
-@app.route('/emails')
-def emails_page():
-    return render_template('emails.html') 
-
 # Kingdom Sub-routes
 @app.route('/kingdom')
 def kingdom_home():
     if get_logged_in_kingdom_user():
-        return redirect(url_for('kingdom/index.html'))
+        return kingdom_authenticated_redirect()
     return render_template('kingdom/index.html', auth_mode='signup')
 
 @app.route('/kingdom/index.html')
@@ -705,13 +590,13 @@ def kingdom_home_index():
 @app.route('/kingdom/login')
 def kingdom_login():
     if get_logged_in_kingdom_user():
-        return redirect(url_for('kingdom/index.html'))
+        return kingdom_authenticated_redirect()
     return render_template('kingdom/index.html', auth_mode='login')
 
 @app.route('/kingdom/verify')
 def kingdom_verify():
     if get_logged_in_kingdom_user():
-        return redirect(url_for('kingdom/verify.html'))
+        return kingdom_authenticated_redirect()
     return render_template('kingdom/verify.html')
 
 @app.route('/kingdom/character')
@@ -974,6 +859,22 @@ def get_user_stats(db, username):
         db['user_stats'][username] = stats
     return stats
 
+def add_bots_to_battle(battle):
+    battle.setdefault("bots", [])
+    battle.setdefault("healths", {})
+    battle.setdefault("cooldowns", {})
+    battle.setdefault("scores", {})
+
+    bot_total = max(0, int(battle.get("bot_count", 0) or 0))
+    for i in range(bot_total):
+        bot = f"Bot-{i + 1}"
+        if bot in battle["bots"]:
+            continue
+        battle["bots"].append(bot)
+        battle["healths"][bot] = 100
+        battle["cooldowns"][bot] = [-1, -1, -1, -1]
+        battle["scores"][bot] = 0
+
 def update_user_stats(db, username, coins_delta=0, score_delta=0, wins_delta=0):
     """Update user stats and save"""
     stats = get_user_stats(db, username)
@@ -1024,8 +925,17 @@ def kingdom_battles_list():
     # POST create battle
     data = request.get_json(silent=True) or {}
     btype = data.get("type", "solo")  # solo, random, ffa, team, bot_battle
-    bot_count = max(1, min(10, data.get("bot_count", 1)))
-    max_players = data.get("max_players", 4) if btype != "solo" else 0
+    try:
+        bot_count = int(data.get("bot_count", 1))
+    except (TypeError, ValueError):
+        bot_count = 1
+    bot_count = max(1, min(10, bot_count))
+
+    try:
+        max_players = int(data.get("max_players", 4)) if btype != "solo" else 0
+    except (TypeError, ValueError):
+        max_players = 4 if btype != "solo" else 0
+    max_players = max(0, max_players)
     
     battle_id = f"b{len(battles)}_{int(datetime.now().timestamp())}"
     new_battle = {
@@ -1036,12 +946,16 @@ def kingdom_battles_list():
         "turn": 0,
         "players": [user["username"]],
         "player_slots": max_players,
+        "bot_count": bot_count,
         "bots": [],
         "healths": {user["username"]: 100},
         "cooldowns": {user["username"]: [-1,-1,-1,-1]},  # turn when available
         "scores": {user["username"]: 0},
         "created": now_utc_iso()
     }
+    if btype == "solo":
+        new_battle["state"] = "active"
+        add_bots_to_battle(new_battle)
     battles.append(new_battle)
     save_db(KINGDOM_DB, db)
     return jsonify({"status": "success", "battle": new_battle})
@@ -1088,14 +1002,7 @@ def battle_join(battle_id):
     # Auto-start solo/full
     if battle["type"] == "solo" or (battle["player_slots"] > 0 and len(battle["players"]) >= battle["player_slots"]):
         battle["state"] = "active"
-        # Add bots
-        for i in range(battle.get("bot_count", 0)):
-            bot = f"Bot-{i+1}"
-            if bot not in battle["bots"]:
-                battle["bots"].append(bot)
-                battle["healths"][bot] = 100
-                battle["cooldowns"][bot] = [-1,-1,-1,-1]
-                battle["scores"][bot] = 0
+        add_bots_to_battle(battle)
     
     save_db(KINGDOM_DB, db)
     return jsonify({"status": "success", "battle": battle})
@@ -1115,16 +1022,27 @@ def battle_action(battle_id):
     
     data = request.get_json(silent=True) or {}
     username = user["username"]
-    power_idx = int(data.get("power_idx", 0))
-    
-    # Check cooldown
-    current_turn = battle["turn"]
-    if battle["cooldowns"][username][power_idx] > current_turn:
-        return jsonify({"status": "error", "message": "Power on cooldown"}), 400
-    
+
     # Turn check (simplified: first player)
     if username not in battle["players"]:
         return jsonify({"status": "error", "message": "Not player"}), 400
+
+    player_cooldowns = battle.get("cooldowns", {}).get(username)
+    if not isinstance(player_cooldowns, list) or not player_cooldowns:
+        return jsonify({"status": "error", "message": "Player cooldowns not found"}), 400
+
+    try:
+        power_idx = int(data.get("power_idx", 0))
+    except (TypeError, ValueError):
+        return jsonify({"status": "error", "message": "Invalid power selection"}), 400
+
+    if power_idx < 0 or power_idx >= len(player_cooldowns):
+        return jsonify({"status": "error", "message": "Power selection out of range"}), 400
+
+    # Check cooldown
+    current_turn = battle["turn"]
+    if player_cooldowns[power_idx] > current_turn:
+        return jsonify({"status": "error", "message": "Power on cooldown"}), 400
     
     # Find target (random enemy)
     all_players = battle["players"] + battle["bots"]
@@ -1139,7 +1057,7 @@ def battle_action(battle_id):
     battle["scores"][username] += dmg
     
     # Cooldown
-    battle["cooldowns"][username][power_idx] = current_turn + (2 + power_idx)  # 2-5 turns
+    player_cooldowns[power_idx] = current_turn + (2 + power_idx)  # 2-5 turns
     
     # Check win
     enemy_healths = {k: v for k, v in battle["healths"].items() if k != username and v > 0}
@@ -1157,75 +1075,7 @@ def battle_action(battle_id):
     })
 
 
-# --- EMAIL SYSTEM API ---
-
-@app.route('/api/auth-email', methods=['POST'])
-def auth_email():
-    try : 
-        data = request.get_json(silent=True) or {}
-        username = normalize_username(data.get('username'))
-        password = (data.get('password') or '').strip()
-
-        if not username or not password:
-            return jsonify({"success": False, "message": "Username and password are required"}), 400
-
-        if len(username) > 20:
-            return jsonify({"success": False, "message": "Username max 20 chars"}), 400
-
-        db = get_email_db()
-        db.setdefault('accounts', [])
-        existing_account = None
-        for account in db.get('accounts', []):
-            if normalize_username(account.get('username')).lower() == username.lower():
-                existing_account = account
-                break
-
-        if password == 'spyyoyo':
-            session.permanent = True
-            session['email_master'] = True
-            return jsonify({"success": True, "mode": "master", "username": username})
-
-        if existing_account:
-            stored_password = (existing_account.get('password') or '').strip()
-            username_lower = username.lower()
-            if username_lower in ['youssef', 'youssf']:
-                if password == 'spyyoyo':
-                    session.permanent = True
-                    session['email_master'] = True
-                    return jsonify({"success": True, "mode": "admin", "username": username})
-                else:
-                    return jsonify({"success": False, "message": "Invalid admin password"}), 401
-            
-            if stored_password != password:
-                return jsonify({"success": False, "message": "Invalid password"}), 401
-            return jsonify({"success": True, "mode": "login", "username": username})
-
-        # New account signup
-        db['accounts'].append({
-            "username": username,
-            "password": password,
-            "created_at": now_utc_iso(),
-        })
-        save_db(EMAIL_DB, db)
-    except Exception as e:
-        return f"Error {str(e)}", 500
-    return jsonify({"success": True, "mode": "signup", "username": username}), 200
-
-@app.route('/api/email/status', methods=['POST'])
-def email_status():
-    data = request.get_json(silent=True) or {}
-    password = (data.get('password') or '').strip()
-
-    if password == EMAIL_ADMIN_PASS:
-        return jsonify({
-            "status": "authorized",
-            "credits": EMAIL_CREDITS,
-            "server": "Celestial-Active"
-        })
-    return jsonify({"status": "unauthorized"}), 401
-
-
-# --- SCHOOL ADMIN API ---
+# --- ADMIN API ---
 
 @app.route('/api/admin/verify', methods=['POST'])
 def verify_admin():
@@ -1246,32 +1096,6 @@ def admin_session_status():
 def admin_logout_api():
     session.pop('master_admin', None)
     return jsonify({"status": "ok"}), 200
-
-@app.route('/api/school/data', methods=['GET'])
-def get_school_data():
-    return jsonify(get_db(SCHOOL_DB))
-
-@app.route('/api/school/update', methods=['POST'])
-def update_school_data():
-    if not session.get('master_admin'):
-        return jsonify({"error": "Not logged in"}), 403
-
-    try:
-        data = request.get_json(silent=True)
-        if data is None:
-            return jsonify({"error": "No JSON data received"}), 400
-        if not isinstance(data, dict):
-            return jsonify({"error": "School data must be a JSON object"}), 400
-
-        data.setdefault("news", {})
-        data.setdefault("exams", [])
-        data.setdefault("timetables", {})
-        save_db(SCHOOL_DB, data)
-        return jsonify({"status": "success"}), 200
-    except DatabasePermissionError as exc:
-        return jsonify({"error": str(exc)}), 500
-    except Exception as exc:
-        return jsonify({"error": str(exc)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

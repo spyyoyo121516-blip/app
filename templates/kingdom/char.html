@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kingdom - Character Forge 2.5</title>
+    <style>
+        /* Base Styling */
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        
+        /* Main Container - Responsive Width */
+        .box { background: #1a1a1a; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,1); width: 95%; max-width: 1200px; border: 1px solid #333; position: relative; margin: 20px; }
+        
+        .hidden { display: none; }
+        .btn { padding: 12px 25px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; transition: 0.3s; margin: 5px; text-transform: uppercase; }
+        .btn-ai { background: #8e44ad; color: white; }
+        .btn-custom { background: #27ae60; color: white; }
+        .btn-send { background: #007bff; color: white; width: 100%; margin-top: 10px; }
+        .btn:disabled { background: #444; cursor: not-allowed; }
+        
+        /* Flex Layout for Desktop, Column for Mobile */
+        .flex-container { display: flex; gap: 20px; margin-top: 20px; min-height: 500px; flex-wrap: wrap; }
+        
+        /* THE SCROLL SYSTEM (Chat) */
+        #ai-chat { 
+            flex: 1.5; 
+            min-width: 300px;
+            background: #f4e4bc; /* Parchment Color */
+            background-image: url('https://www.transparenttextures.com/patterns/papyros.png');
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 8px solid #5d4037; 
+            overflow-y: auto; 
+            height: 450px;
+            text-align: left; 
+            font-size: 15px; 
+            line-height: 1.6;
+            color: #2c1e1a; /* Dark ink color */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            scrollbar-width: thin;
+            scrollbar-color: #5d4037 #f4e4bc;
+        }
+
+        /* Preview & Powers - Responsive */
+        #preview-zone { flex: 1; min-width: 300px; background: #000; border: 2px solid #8e44ad; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; height: 450px; }
+        #powers-list { flex: 0.8; min-width: 200px; background: #111; padding: 15px; border-radius: 12px; border: 1px solid #27ae60; height: 450px; overflow-y: auto; }
+        
+        /* Chat Bubbles on Scroll */
+        .msg-user { color: #0056b3; margin-bottom: 10px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; }
+        .msg-ai { color: #4a148c; margin-bottom: 15px; font-style: italic; border-left: 3px solid #8e44ad; padding-left: 10px; }
+        
+        /* Powers */
+        .power-item { background: #222; padding: 10px; margin: 8px 0; border-radius: 6px; cursor: pointer; border: 1px solid #444; transition: 0.3s; font-size: 13px; text-align: center; color: white; }
+        .power-item:hover { border-color: #8e44ad; background: #2a2a2a; }
+        .power-selected { background: #8e44ad !important; border-color: #fff !important; box-shadow: 0 0 10px #8e44ad; }
+        
+        canvas { background: white; border-radius: 10px; cursor: crosshair; max-width: 100%; height: auto; }
+        #ai-img { width: 100%; height: 100%; object-fit: cover; }
+        #ai-input { width: 100%; height: 60px; background: #222; color: white; border-radius: 8px; padding: 10px; margin-top: 15px; border: 1px solid #444; resize: none; font-size: 14px; outline: none; box-sizing: border-box; }
+        
+        .badge { background: #007bff; font-size: 10px; padding: 2px 6px; border-radius: 4px; vertical-align: middle; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 800px) {
+            .flex-container { flex-direction: column; }
+            #ai-chat, #preview-zone, #powers-list { height: 350px; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h1>HERO FORGE <span class="badge">v2.5</span></h1>
+
+        <div id="choice-screen">
+            <p>Step into the light or the shadows.</p>
+            <button class="btn btn-ai" onclick="startAI()">✨ AI Soul-Forge</button>
+            <button class="btn btn-custom" onclick="startCustom()">🎨 Hand-Drawn Hero</button>
+        </div>
+
+        <div id="custom-screen" class="hidden">
+            <div style="margin-bottom: 10px;">
+                Color: <input type="color" id="colorPicker" value="#000000">
+                Brush: <input type="range" id="brushSize" min="1" max="25" value="5">
+                <button class="btn" style="background:#444; padding:5px 10px;" onclick="clearCanvas()">Clear</button>
+            </div>
+            <canvas id="paintCanvas" width="450" height="400"></canvas>
+            <br>
+            <button class="btn btn-custom" onclick="analyzeDrawing()">Make Realistic & Get Powers</button>
+        </div>
+
+        <div id="ai-screen" class="hidden">
+            <div class="flex-container">
+                <div id="ai-chat">
+                    <div class="msg-ai"><b>Forge Master:</b> Greetings, traveler. Describe the soul you wish to summon into this realm...</div>
+                </div>
+                
+                <div id="preview-zone">
+                    <img id="ai-img" src="https://placehold.co/450x450/111/8e44ad?text=Awaiting+Vision...">
+                </div>
+
+                <div id="powers-list">
+                    <p style="font-weight:bold; color:#27ae60; margin-top:0;">CHOOSE 4 POWERS:</p>
+                    <div id="powers-container"></div>
+                </div>
+            </div>
+
+            <textarea id="ai-input" placeholder="Refine your look (e.g. Glowing green armor and a spectral bow)..."></textarea>
+            <button class="btn btn-send" id="send-btn" onclick="askAI()">Summon Design</button>
+            <button class="btn btn-custom" id="finish-btn" onclick="saveHero()" style="display:none; width:100%; margin-top:10px;">ENTER KINGDOM</button>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyA8qURZLs7tSqFgVuBU_VgBKRlYwKN0qNU';
+        const MODEL = 'gemini-2.5-flash';
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+        
+        let selectedPowers = [];
+
+        function startCustom() {
+            document.getElementById('choice-screen').classList.add('hidden');
+            document.getElementById('custom-screen').classList.remove('hidden');
+            initCanvas();
+        }
+
+        function startAI() {
+            document.getElementById('choice-screen').classList.add('hidden');
+            document.getElementById('ai-screen').classList.remove('hidden');
+        }
+
+        // Canvas Logic
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+
+        function initCanvas() {
+            canvas.onmousedown = () => painting = true;
+            window.onmouseup = () => { painting = false; ctx.beginPath(); };
+            canvas.onmousemove = (e) => {
+                if (!painting) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineWidth = document.getElementById('brushSize').value;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = document.getElementById('colorPicker').value;
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            };
+        }
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        async function askAI(customPrompt = null) {
+            const inputField = document.getElementById('ai-input');
+            const promptValue = customPrompt || inputField.value.trim();
+            const chat = document.getElementById('ai-chat');
+            const btn = document.getElementById('send-btn');
+            const imgElement = document.getElementById('ai-img');
+
+            if (!promptValue) return;
+            if (!customPrompt) chat.innerHTML += `<div class="msg-user"><b>You:</b> ${promptValue}</div>`;
+            
+            // Auto-scroll the parchment scroll
+            chat.scrollTop = chat.scrollHeight;
+
+            btn.disabled = true;
+            btn.innerText = "Forging...";
+
+            try {
+                const response = await fetch(URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ 
+                            parts: [{ text: `You are a cinematic RPG character designer. 
+                            1. Describe this character realistically in 3 sentences: ${promptValue}. 
+                            2. Provide 6 unique superpowers that fit their theme.
+                            Format the powers ONLY as a comma-separated list at the very last line.` }] 
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                
+                chat.innerHTML += `<div class="msg-ai"><b>Forge:</b> ${aiResponse}</div>`;
+                
+                // Realistic Image
+                const imgQuery = encodeURIComponent(promptValue + " realistic cinematic fantasy character portrait high detail 8k");
+                imgElement.src = `https://image.pollinations.ai/prompt/${imgQuery}?width=450&height=450&nologo=true&model=flux`;
+
+                // Extract Powers
+                const lines = aiResponse.trim().split('\n');
+                const powerLine = lines[lines.length - 1];
+                generatePowerButtons(powerLine);
+                
+                document.getElementById('finish-btn').style.display = "block";
+
+            } catch (err) {
+                chat.innerHTML += `<div style="color:red;"><b>Error:</b> Spirits are busy. Try again.</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Summon Design";
+                chat.scrollTop = chat.scrollHeight; // Final scroll down
+                inputField.value = "";
+            }
+        }
+
+        function generatePowerButtons(rawPowers) {
+            const container = document.getElementById('powers-container');
+            container.innerHTML = "";
+            selectedPowers = []; 
+            const list = rawPowers.replace(/Powers:|List:|1\.|2\.|3\./gi, '').split(',').map(p => p.trim());
+            
+            list.forEach(p => {
+                if(p.length < 2) return;
+                const div = document.createElement('div');
+                div.className = "power-item";
+                div.innerText = p;
+                div.onclick = () => {
+                    if (selectedPowers.includes(p)) {
+                        selectedPowers = selectedPowers.filter(item => item !== p);
+                        div.classList.toggle('power-selected');
+                    } else if (selectedPowers.length < 4) {
+                        selectedPowers.push(p);
+                        div.classList.toggle('power-selected');
+                    } else {
+                        alert("Max 4 powers!");
+                    }
+                };
+                container.appendChild(div);
+            });
+        }
+
+        async function analyzeDrawing() {
+            const vibe = prompt("Briefly describe your drawing:");
+            if(!vibe) return;
+            startAI();
+            document.getElementById('custom-screen').classList.add('hidden');
+            setTimeout(() => {
+                askAI(`Based on a drawing of a ${vibe}, transform it into a hyper-realistic cinematic hero with themed superpowers.`);
+            }, 300);
+        }
+
+        function saveHero() {
+    // 1. Validation: Ensure user picked exactly 4 powers
+    if (selectedPowers.length !== 4) {
+        return alert("The Oracle demands you choose exactly 4 powers to proceed.");
+    }
+
+    const user = localStorage.getItem('activeUser') || "guest";
+    
+    // 2. Prepare the Data Package
+    const heroData = {
+        username: user,
+        heroName: document.getElementById('hero-name')?.value || "Unnamed Legend",
+        image: document.getElementById('ai-img').src,
+        powers: selectedPowers,
+        story: document.getElementById('ai-chat').innerText
+    };
+
+    // 3. Attempt to save to Python Database (main.py)
+    fetch('/api/kingdom/save-hero', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(heroData)
+    })
+    .then(res => {
+        if (res.ok) {
+            alert("Soul Forged! Your legend is saved in the Kingdom Database.");
+            window.location.href = "/kingdom/game";
+        } else {
+            throw new Error("Database offline");
+        }
+    })
+    .catch(err => {
+        // 4. Fallback: Save to Local Storage if Database is down
+        console.warn("Database not reached. Saving to local scrolls instead.");
+        localStorage.setItem('heroSprite_' + user, heroData.image);
+        localStorage.setItem('heroPowers_' + user, JSON.stringify(selectedPowers));
+        localStorage.setItem('heroStory_' + user, heroData.story);
+        
+        alert("Character Saved Locally! (Database Connection Pending)");
+        window.location.href = "/kindom/game";
+    });
+}
+    </script>
+</body>
+</html>

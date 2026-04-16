@@ -1,0 +1,121 @@
+{
+    "users": [
+        {
+            "username": "admin",
+            "password": "spyyoyo",
+            "email": "admin@spyyoyo.xyz"
+        },
+        {
+            "username": "spyyyoyo",
+            "password": "62535467",
+            "email": "youssef@spyyoyo.xyz",
+            "birthdate": "2000-02-02"
+        },
+        {
+            "username": "asdasdas",
+            "password": "odelinda359@ptct.net",
+            "email": "odelinda359@ptct.net"
+        },
+        {
+            "username": "odelinda359@ptct.net",
+            "password": "odelinda359@ptct.net",
+            "email": "odelinda359@ptct.net"
+        },
+        {
+            "username": "youssefayman151216@gmail.com",
+            "password": "sibmu5-fizziV-rahhik",
+            "email": "youssefayman151216@gmail.com"
+        },
+        {
+            "username": "yyy",
+            "email": "ilsasatisfactory@sharebot.net",
+            "password": "ilsasatisfactory@sharebot.net",
+            "birthdate": "24565-02-13",
+            "verified_at": "2026-04-05T18:00:51.525554"
+        },
+        {
+            "username": "youssef",
+            "email": "spyyoyo121516@gmail.com",
+            "password": "3625264633",
+            "birthdate": "2026-02-02",
+            "verified_at": "2026-04-05T18:16:36.132199"
+        }
+    ],
+    "heroes": {
+        "spyyyoyo": {
+            "sprite": null,
+            "powers": [
+                "Liquid Forge",
+                "Cryo-Thermic Command",
+                "Hydro-Environmental Synthesis",
+                "Pressure Cascade"
+            ]
+        },
+        "youssef": {
+            "sprite": "https://image.pollinations.ai/prompt/Based%20on%20a%20drawing%20of%20a%20king%2C%20transform%20it%20into%20a%20hyper-realistic%20cinematic%20hero%20with%20themed%20superpowers.%20realistic%20cinematic%20fantasy%20character%20portrait%20high%20detail%208k?width=450&height=450&nologo=true&model=flux",
+            "powers": [
+                "Sovereign's Gaze",
+                "Aegis of the Kingdom",
+                "Spirit of the Forebears",
+                "Geomantic Command"
+            ]
+        },
+        "youssefayman151216@gmail.com": {
+            "username": "youssefayman151216@gmail.com",
+            "hero_name": "Unnamed Legend",
+            "sprite": "https://image.pollinations.ai/prompt/King%20realistic%20cinematic%20fantasy%20character%20portrait%20high%20detail%208k?width=700&height=700&nologo=true&model=flux",
+            "powers": [
+                "Crown's Aegis",
+                "Iron Decree",
+                "Royal Burden",
+                "Aura of Command"
+            ],
+            "story": "Forge Master: Welcome, traveler. Speak the shape of the champion you want to summon into this kingdom.\nForge: This monarch is no mere figurehead; his regal bearing is etched with the scars of countless battles, a hyper-realistic fusion of ancient nobility and a seasoned warrior whose eyes reflect both the burden of his crown and an unshakeable resolve. Clad in ornate yet practical armor that subtly shifts and glows with an inner power, each plate and rivet tells a story of dominion and sacred duty, seamlessly blending historical grandeur with divine functionality. An unmistakable aura of command emanates from him, a palpable force that hints at the ancient, themed powers woven into his very being, destined to defend his people and reshape the fate of his kingdom. Sovereign's Dominion, Regal Presence, Divine Right's Aegis, Crown's Will Manifestation, Heirloom's Call, Oathbreaker's Folly\nYou: King\nForge: His heavy, intricately forged armor, though gleaming, shows the subtle dents and scratches of countless battles, a testament to a reign spent on the front lines. A deeply etched brow and world-weary eyes beneath a shadowed crown betray the immense weight of his kingdom's fate resting squarely on his shoulders. Yet, his posture remains unyielding, a formidable, silent bastion of authority and experience, radiating a quiet power that commands immediate respect. Aura of Command, Iron Decree, Crown's Aegis, Royal Burden, Voice of Sovereignty, Domain's Wrath",
+            "updated_at": "2026-04-05T19:16:36.417374"
+        },
+        "yyy": {
+            "username": "yyy",
+            "hero_name": "Unnamed Legend",
+            "sprite": "https://image.pollinations.ai/prompt/A%20tall%20black%20guy%20with%20green%20arrows%20realistic%20cinematic%20fantasy%20character%20portrait%20high%20detail%208k?width=450&height=450&nologo=true&model=flux",
+            "powers": [
+                "Verdant Volley",
+                "Emerald Eradication",
+                "Reverberating Resonance",
+                "Chroma Camouflage"
+            ],
+            "story": "Forge Master: Greetings, traveler. Describe the soul you wish to summon into this realm...\nYou: A tall black guy with green arrows\nForge: He\u2019s a commanding figure, a tall Black man with an athletic, lean build that speaks of agility and enduring resilience. His quivers are packed with a specialized array of arrows, their fletchings a vibrant, almost luminescent emerald green, providing a stark visual contrast against darker materials. A faint, moss-like glow sometimes emanates from the arrowheads, suggesting they are imbued with an unusual, perhaps natural, reactive property. Verdant Volley, Emerald Eradication, Kinetic Quill, Chroma Camouflage, Reverberating Resonance, Sylvan Sentry",
+            "updated_at": "2026-04-06T05:25:04.957755"
+        }
+    },
+    "logs": [
+        {
+            "type": "hero_saved",
+            "username": "youssefayman151216@gmail.com",
+            "hero_name": "Unnamed Legend",
+            "created_at": "2026-04-05T19:16:36.417388"
+        },
+        {
+            "type": "hero_saved",
+            "username": "yyy",
+            "hero_name": "Unnamed Legend",
+            "created_at": "2026-04-06T05:23:37.416074"
+        },
+        {
+            "type": "hero_saved",
+            "username": "yyy",
+            "hero_name": "Unnamed Legend",
+            "created_at": "2026-04-06T05:25:04.957771"
+        }
+    ],
+    "pending_verifications": [
+        {
+            "username": "hsusggd",
+            "email": "kimoayman219@gmail.com",
+            "password": "36746373",
+            "birthdate": "2026-03-03",
+            "otp": "808962",
+            "created_at": "2026-04-05T19:02:17.986699",
+            "expires_at": "2026-04-05T19:12:17.986710"
+        }
+    ]
+}

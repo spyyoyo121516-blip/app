@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Files</title>
+    <style>
+        :root {
+            --bg: #06101b;
+            --panel: rgba(10, 20, 35, 0.84);
+            --panel-strong: rgba(12, 24, 42, 0.96);
+            --line: rgba(138, 198, 255, 0.18);
+            --text: #f3f7ff;
+            --muted: #9fb2cf;
+            --mint: #7bf1c3;
+            --cyan: #7ce8ff;
+            --danger: #ff9e9e;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(96, 214, 255, 0.14), transparent 24%),
+                radial-gradient(circle at bottom right, rgba(109, 227, 198, 0.15), transparent 22%),
+                linear-gradient(160deg, #03060d 0%, #071120 48%, #0a1831 100%);
+            padding: 28px;
+        }
+
+        .wrap { max-width: 1240px; margin: 0 auto; }
+
+        .suite-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .suite-nav a {
+            text-decoration: none;
+            color: var(--text);
+            padding: 11px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            font-size: 0.95rem;
+        }
+
+        .suite-nav a.active {
+            background: linear-gradient(135deg, rgba(113, 235, 203, 0.18), rgba(100, 182, 255, 0.18));
+            color: #fff;
+        }
+
+        .hero,
+        .panel,
+        .item,
+        .stat {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            backdrop-filter: blur(16px);
+        }
+
+        .hero {
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.85fr);
+            gap: 18px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(124, 232, 255, 0.18);
+            color: var(--cyan);
+            background: rgba(124, 232, 255, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.72rem;
+        }
+
+        h1 {
+            margin: 18px 0 12px;
+            font-size: clamp(2.5rem, 6vw, 4.8rem);
+            line-height: 0.95;
+            text-transform: uppercase;
+        }
+
+        h2 { margin: 0 0 14px; }
+
+        p { margin: 0; color: var(--muted); line-height: 1.7; }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .hero-actions a,
+        button {
+            text-decoration: none;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 13px 16px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hero-actions .primary,
+        button.primary {
+            background: linear-gradient(135deg, #71ebcb, #64b6ff);
+            color: #05111d;
+            border: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat { padding: 20px; }
+        .stat small { display:block; margin-bottom: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; }
+        .stat strong { font-size: 2rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+            gap: 20px;
+        }
+
+        .panel { padding: 24px; }
+
+        form { display: grid; gap: 12px; }
+
+        input, button {
+            width: 100%;
+        }
+
+        input {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font: inherit;
+            padding: 12px 14px;
+        }
+
+        input[type="file"] { padding: 10px; }
+
+        .list { display: grid; gap: 14px; }
+
+        .item {
+            padding: 18px;
+            background: var(--panel-strong);
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .filename { font-weight: 700; word-break: break-word; }
+        .meta { color: var(--muted); margin-top: 6px; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .actions a,
+        .actions button {
+            width: auto;
+            border-radius: 999px;
+            padding: 10px 14px;
+        }
+
+        .actions button {
+            background: rgba(255, 158, 158, 0.12);
+            color: #ffd7d7;
+            border-color: rgba(255, 158, 158, 0.28);
+        }
+
+        .inline-form { display: inline; }
+
+        .empty {
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px dashed var(--line);
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .hero-grid,
+            .stats,
+            .grid { grid-template-columns: 1fr; }
+            .item { flex-direction: column; align-items: flex-start; }
+            .actions { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    {% if not admin_unlocked %}
+    <div id="gate" style="position:fixed;inset:0;z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,5,13,0.94);backdrop-filter:blur(12px);">
+        <div style="width:min(460px,100%);padding:34px;border-radius:30px;border:1px solid rgba(130,203,255,0.18);background:rgba(7,14,28,0.96);box-shadow:0 24px 80px rgba(0,0,0,0.45);text-align:center;">
+            <h2 style="margin:18px 0 12px;font-size:2rem;text-transform:uppercase;letter-spacing:.04em;">Admin Password</h2>
+            <p>Enter the master password to open this admin page.</p>
+            <input id="admin-pass" type="password" placeholder="Admin password" style="width:100%;margin-top:18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font:inherit;">
+            <button type="button" onclick="unlockAdmin()" style="width:100%;margin-top:14px;padding:14px 16px;border:none;border-radius:16px;font:inherit;font-weight:700;cursor:pointer;color:#06111f;background:linear-gradient(135deg,#78ecff,#7af3c4);">Open page</button>
+            <div id="gate-error" style="display:none;margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,121,152,0.14);border:1px solid rgba(255,121,152,0.25);color:#ffd4de;">Wrong password. Try again.</div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="wrap"{% if not admin_unlocked %} style="display:none;"{% endif %}>
+        <nav class="suite-nav">
+            <a href="{{ url_for('admin_index') }}">Admin Home</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
+            <a href="{{ url_for('admin_notes') }}">Notes</a>
+            <a href="{{ url_for('admin_links') }}">Links</a>
+        </nav>
+        <section class="hero">
+            <div class="hero-grid">
+                <div>
+                    <span class="eyebrow">Asset Vault</span>
+                    <h1>Admin Files</h1>
+                    <p>Professional file management for the admin suite. Upload shared assets, review stored items, and open or remove files from one polished page.</p>
+                    <div class="hero-actions">
+                        <a class="primary" href="{{ url_for('admin_index') }}">Back to admin</a>
+                        <a href="{{ url_for('admin_dashboard') }}">Open dashboard</a>
+                    </div>
+                </div>
+                <div class="panel" style="padding:20px;">
+                    <h2>File Operations</h2>
+                    <p>Use this page to keep admin uploads organized and easy to review.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat"><small>Total Files</small><strong>{{ files|length }}</strong></div>
+            <div class="stat"><small>Storage Area</small><strong>Uploads</strong></div>
+            <div class="stat"><small>Access</small><strong>Admin</strong></div>
+        </section>
+
+        <div class="grid">
+            <section class="panel">
+                <h2>Upload a file</h2>
+                <p style="margin-bottom:16px;">Add a file to the shared static uploads area.</p>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" required>
+                    <button class="primary" type="submit">Upload file</button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Available files</h2>
+                {% if files %}
+                    <div class="list">
+                        {% for file in files|sort %}
+                            <article class="item">
+                                <div>
+                                    <div class="filename">{{ file }}</div>
+                                    <div class="meta">Stored in `/static/uploads`</div>
+                                </div>
+                                <div class="actions">
+                                    <a href="{{ url_for('static', filename='uploads/' ~ file) }}" target="_blank" rel="noopener noreferrer">Open</a>
+                                    <a href="{{ url_for('static', filename='uploads/' ~ file) }}" download>Download</a>
+                                    <form class="inline-form" method="post">
+                                        <input type="hidden" name="delete" value="{{ file }}">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty">No uploaded files yet.</div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+    <script>
+        const nextTarget = {{ next_target|tojson }};
+
+        async function unlockAdmin() {
+            const passInput = document.getElementById('admin-pass');
+            const errorBox = document.getElementById('gate-error');
+            if (!passInput) return;
+            const res = await fetch('/api/admin/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ password: passInput.value })
+            });
+            if (res.ok) {
+                window.location.href = nextTarget || '/admin';
+                return;
+            }
+            if (errorBox) errorBox.style.display = 'block';
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && document.getElementById('gate')) unlockAdmin();
+        });
+
+        if (document.getElementById('gate')) {
+            const savedPassword = sessionStorage.getItem('adminMasterPassword');
+            const passInput = document.getElementById('admin-pass');
+            if (savedPassword && passInput) {
+                passInput.value = savedPassword;
+                unlockAdmin();
+            }
+        }
+    </script>
+</body>
+</html>

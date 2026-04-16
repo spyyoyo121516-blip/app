@@ -1,0 +1,681 @@
+<<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kingdom | Verify Soul</title>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+    ></script>
+    <style>
+      :root {
+        --bg-1: #060b15;
+        --bg-2: #10213a;
+        --bg-3: #1d1224;
+        --panel: rgba(7, 13, 23, 0.88);
+        --text: #f8f5ed;
+        --muted: #aeb8c7;
+        --ice: #88e2ff;
+        --ice-strong: #35c4ff;
+        --gold: #f7c86f;
+        --error: #ff9d9d;
+        --success: #9efacb;
+        --shadow: 0 30px 90px rgba(0, 0, 0, 0.52);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Georgia, "Trebuchet MS", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(136, 226, 255, 0.18), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(247, 200, 111, 0.14), transparent 25%),
+          linear-gradient(140deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 30px 30px;
+        mask-image: radial-gradient(circle at center, black 42%, transparent 85%);
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
+      .topbar {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        z-index: 5;
+      }
+
+      .user-pill,
+      .logout-btn {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(7, 13, 23, 0.82);
+        color: var(--text);
+        padding: 10px 15px;
+        font-size: 0.82rem;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(12px);
+      }
+
+      .logout-btn {
+        cursor: pointer;
+        text-transform: uppercase;
+      }
+
+      .verify-shell {
+        width: min(1080px, 100%);
+        display: grid;
+        grid-template-columns: 0.96fr 1.04fr;
+        border-radius: 34px;
+        overflow: hidden;
+        background: rgba(6, 10, 18, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .info-panel {
+        min-height: 700px;
+        padding: 46px 38px;
+        background:
+          linear-gradient(180deg, rgba(136, 226, 255, 0.08), transparent 34%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .sigil {
+        width: 98px;
+        height: 98px;
+        border-radius: 28px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, rgba(136, 226, 255, 0.18), rgba(247, 200, 111, 0.16));
+        border: 1px solid rgba(136, 226, 255, 0.24);
+        color: var(--gold);
+        font-size: 2.2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 12px;
+        color: var(--ice);
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.24em;
+      }
+
+      .info-panel h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(2.5rem, 5vw, 4.4rem);
+        line-height: 0.95;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .info-panel p {
+        max-width: 430px;
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .mail-badge,
+      .check-item {
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .mail-badge {
+        margin-top: 26px;
+        padding: 18px 20px;
+      }
+
+      .mail-badge span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+      }
+
+      .mail-badge strong {
+        color: var(--gold);
+        font-size: 1.08rem;
+        word-break: break-word;
+      }
+
+      .check-grid {
+        display: grid;
+        gap: 14px;
+        margin-top: 30px;
+      }
+
+      .check-item {
+        padding: 16px;
+      }
+
+      .check-item strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--text);
+      }
+
+      .check-item span {
+        color: var(--muted);
+        line-height: 1.6;
+        font-size: 0.95rem;
+      }
+
+      .form-panel {
+        padding: 40px 32px;
+        background: var(--panel);
+        border-left: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .verify-card {
+        width: 100%;
+        max-width: 450px;
+        padding: 28px;
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .verify-card h2 {
+        margin: 0;
+        font-size: 2.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .verify-card p {
+        margin: 12px 0 24px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .otp-row {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .otp-row input {
+        width: 100%;
+        aspect-ratio: 1 / 1.08;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(3, 7, 16, 0.84);
+        color: var(--text);
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        outline: none;
+        transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+      }
+
+      .otp-row input:focus {
+        border-color: rgba(53, 196, 255, 0.3);
+        box-shadow: 0 0 0 4px rgba(53, 196, 255, 0.11);
+        transform: translateY(-1px);
+      }
+
+      .status-card {
+        min-height: 82px;
+        margin-bottom: 18px;
+        padding: 16px 18px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .status-card.success {
+        color: var(--success);
+        border-color: rgba(158, 250, 203, 0.24);
+        background: rgba(158, 250, 203, 0.08);
+      }
+
+      .status-card.error {
+        color: var(--error);
+        border-color: rgba(255, 157, 157, 0.24);
+        background: rgba(255, 157, 157, 0.08);
+      }
+
+      .btn-row {
+        display: grid;
+        gap: 12px;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px 18px;
+        border-radius: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        cursor: pointer;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
+      }
+
+      .btn-primary {
+        border: none;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--ice-strong) 100%);
+        color: #07111a;
+        box-shadow: 0 18px 36px rgba(53, 196, 255, 0.22);
+      }
+
+      .btn-secondary,
+      .btn-ghost {
+        background: transparent;
+      }
+
+      .btn-secondary {
+        color: var(--gold);
+        border: 1px solid rgba(247, 200, 111, 0.32);
+      }
+
+      .btn-ghost {
+        color: var(--muted);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .mini-note {
+        margin-top: 14px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      @media (max-width: 920px) {
+        .verify-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .info-panel {
+          min-height: auto;
+          padding: 34px 24px 26px;
+        }
+
+        .form-panel {
+          padding: 28px 20px 34px;
+          border-left: none;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+      }
+
+      @media (max-width: 560px) {
+        body {
+          padding: 16px 12px;
+        }
+
+        .topbar {
+          position: static;
+          margin-bottom: 12px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .verify-card {
+          padding: 22px 16px;
+        }
+
+        .otp-row input {
+          font-size: 1.2rem;
+          border-radius: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="user-pill">
+        {% if kingdom_username %}User: {{ kingdom_username }}{% else %}User: Guest{% endif %}
+      </div>
+      {% if kingdom_username %}
+      <form method="post" action="/kingdom/logout">
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="verify-shell">
+      <section class="info-panel">
+        <div>
+          <div class="sigil">KG</div>
+          <div class="eyebrow">Step 2 - Verification Chamber</div>
+          <h1>Present The Code</h1>
+          <p>
+            The chamber opens after registration. Present the six-digit code to bind your account
+            and unlock the path to the forge.
+          </p>
+
+          <div class="mail-badge">
+            <span>Current Target</span>
+            <strong id="email-preview">Searching for pending signup...</strong>
+          </div>
+        </div>
+
+        <div class="check-grid">
+          <div class="check-item">
+            <strong>Registry</strong>
+            <span>Seal codes are issued from the registry chamber before they can be presented here.</span>
+          </div>
+          <div class="check-item">
+            <strong>Expiry Window</strong>
+            <span>Each code remains active for 10 minutes before the chamber rejects it.</span>
+          </div>
+          <div class="check-item">
+            <strong>After Success</strong>
+            <span>After verification, you go straight to the character forge to design your champion.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-panel">
+        <div class="verify-card">
+          <div class="eyebrow">Verification</div>
+          <h2>Enter The Seal</h2>
+          <p>
+            Type the six-digit code sent to your royal email. If the code is lost, request another one from this chamber.
+          </p>
+
+          <div class="otp-row" id="otp-row">
+            <input type="text" inputmode="numeric" maxlength="1" data-index="0" />
+            <input type="text" inputmode="numeric" maxlength="1" data-index="1" />
+            <input type="text" inputmode="numeric" maxlength="1" data-index="2" />
+            <input type="text" inputmode="numeric" maxlength="1" data-index="3" />
+            <input type="text" inputmode="numeric" maxlength="1" data-index="4" />
+            <input type="text" inputmode="numeric" maxlength="1" data-index="5" />
+          </div>
+
+          <div id="status-card" class="status-card">
+            Looking for pending signup details in this browser...
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="verify-btn" onclick="confirmVerify()">
+              Open The Forge
+            </button>
+            <button class="btn btn-secondary" id="resend-btn" onclick="resendCode()">
+              Send New Code
+            </button>
+            <button class="btn btn-ghost" onclick="window.location.href = '/kingdom'">
+              Return To Registry
+            </button>
+          </div>
+
+          <div class="mini-note">OTP records expire after 10 minutes.</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const EMAILJS_PUBLIC_KEY = "S-tawjvA5mozda0-4";
+      const EMAILJS_SERVICE_ID = "service_izmmagj";
+      const EMAILJS_TEMPLATE_ID = "template_lbv8aqb";
+      const otpInputs = Array.from(document.querySelectorAll("#otp-row input"));
+      const emailClient = window.emailjs || null;
+
+      if (emailClient) {
+        emailClient.init({
+          publicKey: EMAILJS_PUBLIC_KEY,
+        });
+      }
+
+      function getPendingData() {
+        try {
+          return JSON.parse(
+            localStorage.getItem("kingdomPendingVerification") || "null",
+          );
+        } catch (_error) {
+          return null;
+        }
+      }
+
+      function setStatus(message, type = "") {
+        const card = document.getElementById("status-card");
+        card.textContent = message;
+        card.className = "status-card";
+        if (type) {
+          card.classList.add(type);
+        }
+      }
+
+      function setButtonsDisabled(disabled) {
+        document.getElementById("verify-btn").disabled = disabled;
+        document.getElementById("resend-btn").disabled = disabled;
+      }
+
+      function getOtpValue() {
+        return otpInputs.map((input) => input.value).join("");
+      }
+
+      function clearOtpInputs() {
+        otpInputs.forEach((input) => {
+          input.value = "";
+        });
+        otpInputs[0].focus();
+      }
+
+      function fillEmailPreview() {
+        const pending = getPendingData();
+        const preview = document.getElementById("email-preview");
+
+        if (!pending || !pending.email) {
+          preview.textContent = "No pending signup found";
+          setStatus(
+            "No pending signup was found in this browser. Start again from the register page.",
+            "error",
+          );
+          setButtonsDisabled(true);
+          return null;
+        }
+
+        preview.textContent = pending.email;
+        setStatus(
+          `Ready to verify ${pending.email}. Enter the current six-digit code.`,
+          "",
+        );
+        return pending;
+      }
+
+      async function sendCodeByEmail({ email, username, otp }) {
+        if (!emailClient) {
+          throw new Error("Email service is unavailable right now. Please try again in a moment.");
+        }
+
+        return emailClient.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          passcode: otp,
+          email: email,
+        });
+      }
+
+      async function resendCode() {
+        const pending = getPendingData();
+        if (!pending || !pending.email) {
+          setStatus(
+            "Cannot resend because no pending signup is stored locally.",
+            "error",
+          );
+          return;
+        }
+
+        setButtonsDisabled(true);
+        setStatus(`Requesting a fresh OTP for ${pending.email}...`, "");
+
+        try {
+          const response = await fetch("/api/kingdom/resend-code", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: pending.email }),
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(
+              data.message || "Unable to refresh the verification code.",
+            );
+          }
+
+          await sendCodeByEmail({
+            email: data.email,
+            username: data.username || pending.username,
+            otp: data.otp,
+          });
+
+          setStatus(
+            `A new code was sent to ${data.email}. The previous OTP is no longer valid.`,
+            "success",
+          );
+          clearOtpInputs();
+        } catch (error) {
+          console.error(error);
+          setStatus(
+            error.message || "Failed to resend the verification code.",
+            "error",
+          );
+        } finally {
+          setButtonsDisabled(false);
+        }
+      }
+
+      async function confirmVerify() {
+        const pending = getPendingData();
+        const otp = getOtpValue();
+
+        if (!pending || !pending.email) {
+          setStatus(
+            "No pending signup is available. Go back and register again.",
+            "error",
+          );
+          return;
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+          setStatus("Enter the full 6-digit code.", "error");
+          return;
+        }
+
+        setButtonsDisabled(true);
+        setStatus("Verifying code against the kingdom database...", "");
+
+        try {
+          const response = await fetch("/api/kingdom/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: pending.email,
+              otp,
+            }),
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.message || "Verification failed.");
+          }
+
+          localStorage.setItem(
+            "activeUser",
+            result.username || pending.username,
+          );
+          localStorage.removeItem("kingdomPendingVerification");
+          localStorage.removeItem("tempUser");
+          localStorage.removeItem("tempEmail");
+          localStorage.removeItem("tempBirth");
+          localStorage.removeItem("tempPass");
+
+          setStatus(
+            "Soul verified. Opening the kingdom character gate...",
+            "success",
+          );
+          window.location.href = "/kingdom/character";
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || "Verification failed.", "error");
+        } finally {
+          setButtonsDisabled(false);
+        }
+      }
+
+      otpInputs.forEach((input, index) => {
+        input.addEventListener("input", (event) => {
+          const value = event.target.value.replace(/\D/g, "").slice(0, 1);
+          event.target.value = value;
+
+          if (value && index < otpInputs.length - 1) {
+            otpInputs[index + 1].focus();
+          }
+        });
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Backspace" && !event.target.value && index > 0) {
+            otpInputs[index - 1].focus();
+          }
+        });
+
+        input.addEventListener("paste", (event) => {
+          event.preventDefault();
+          const pasted = (event.clipboardData.getData("text") || "")
+            .replace(/\D/g, "")
+            .slice(0, 6);
+          if (!pasted) {
+            return;
+          }
+          pasted.split("").forEach((digit, digitIndex) => {
+            if (otpInputs[digitIndex]) {
+              otpInputs[digitIndex].value = digit;
+            }
+          });
+          const nextIndex = Math.min(pasted.length, otpInputs.length - 1);
+          otpInputs[nextIndex].focus();
+        });
+      });
+
+      fillEmailPreview();
+    </script>
+  </body>
+</html>

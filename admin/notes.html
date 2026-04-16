@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy Yoyo Notes</title>
+    <style>
+        :root {
+            --bg: #07111d;
+            --panel: rgba(10, 18, 33, 0.82);
+            --panel-strong: rgba(13, 25, 43, 0.94);
+            --line: rgba(157, 213, 255, 0.14);
+            --text: #f6faff;
+            --muted: #9fb3ca;
+            --glow: 0 22px 60px rgba(0, 0, 0, 0.35);
+            --aurora-a: linear-gradient(135deg, #6ce6cf, #79a8ff);
+            --sunset-a: linear-gradient(135deg, #ff9b85, #ffc05f);
+            --rose-a: linear-gradient(135deg, #ff88b5, #ff6d7a);
+            --lime-a: linear-gradient(135deg, #8ae97d, #39d2a6);
+            --violet-a: linear-gradient(135deg, #9a8dff, #5fc2ff);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--text);
+            font-family: Georgia, "Times New Roman", serif;
+            background:
+                radial-gradient(circle at top left, rgba(118, 255, 207, 0.12), transparent 22%),
+                radial-gradient(circle at top right, rgba(130, 173, 255, 0.18), transparent 25%),
+                radial-gradient(circle at bottom left, rgba(255, 140, 176, 0.14), transparent 24%),
+                linear-gradient(155deg, #03070d 0%, #07111d 42%, #0d1930 100%);
+            min-height: 100vh;
+        }
+
+        .shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 28px 20px 36px;
+        }
+
+        .suite-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .suite-nav a {
+            text-decoration: none;
+            color: var(--text);
+            padding: 11px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255,255,255,0.04);
+            font-size: 0.95rem;
+        }
+
+        .suite-nav a.active {
+            background: linear-gradient(135deg, rgba(108, 230, 207, 0.18), rgba(121, 168, 255, 0.18));
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .title-stack h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2.4rem, 7vw, 4.9rem);
+            line-height: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .title-stack p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 720px;
+            line-height: 1.7;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .stat {
+            padding: 18px;
+            border-radius: 20px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            box-shadow: var(--glow);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.9rem;
+            margin-bottom: 6px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: var(--glow);
+            backdrop-filter: blur(16px);
+        }
+
+        .composer {
+            padding: 22px;
+            position: sticky;
+            top: 16px;
+        }
+
+        .composer h2,
+        .board h2 {
+            margin: 0 0 8px;
+            font-size: 1.4rem;
+        }
+
+        .sub {
+            color: var(--muted);
+            margin: 0 0 18px;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            padding: 14px 15px;
+            margin-bottom: 14px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 4px 0 18px;
+            color: var(--muted);
+        }
+
+        .checkbox input {
+            accent-color: #73dcbf;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            border-radius: 16px;
+            padding: 13px 16px;
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: var(--aurora-a);
+            color: #041118;
+            flex: 1;
+        }
+
+        .secondary {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .board {
+            padding: 22px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(160px, 0.7fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .note-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .note {
+            border-radius: 24px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            color: #041118;
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+        }
+
+        .note.aurora { background: var(--aurora-a); }
+        .note.sunset { background: var(--sunset-a); }
+        .note.rose { background: var(--rose-a); }
+        .note.lime { background: var(--lime-a); }
+        .note.violet { background: var(--violet-a); }
+
+        .note::after {
+            content: "";
+            position: absolute;
+            inset: auto -10% -28% auto;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
+            filter: blur(10px);
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: rgba(4, 17, 24, 0.14);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .flags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .note h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            line-height: 1.15;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .section strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(4, 17, 24, 0.12);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .note-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .note-actions form {
+            margin: 0;
+        }
+
+        .note-actions button,
+        .note-actions a {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(4, 17, 24, 0.14);
+            color: inherit;
+            text-decoration: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        .empty {
+            padding: 28px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.16);
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .composer {
+                position: static;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .toolbar,
+            .split,
+            .topbar {
+                grid-template-columns: 1fr;
+                display: grid;
+            }
+
+            .topbar {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if not admin_unlocked %}
+    <div id="gate" style="position:fixed;inset:0;z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,5,13,0.94);backdrop-filter:blur(12px);">
+        <div style="width:min(460px,100%);padding:34px;border-radius:30px;border:1px solid rgba(130,203,255,0.18);background:rgba(7,14,28,0.96);box-shadow:0 24px 80px rgba(0,0,0,0.45);text-align:center;">
+            <h2 style="margin:18px 0 12px;font-size:2rem;text-transform:uppercase;letter-spacing:.04em;">Admin Password</h2>
+            <p>Enter the master password to open this admin page.</p>
+            <input id="admin-pass" type="password" placeholder="Admin password" style="width:100%;margin-top:18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font:inherit;">
+            <button type="button" onclick="unlockAdmin()" style="width:100%;margin-top:14px;padding:14px 16px;border:none;border-radius:16px;font:inherit;font-weight:700;cursor:pointer;color:#06111f;background:linear-gradient(135deg,#78ecff,#7af3c4);">Open page</button>
+            <div id="gate-error" style="display:none;margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,121,152,0.14);border:1px solid rgba(255,121,152,0.25);color:#ffd4de;">Wrong password. Try again.</div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="shell"{% if not admin_unlocked %} style="display:none;"{% endif %}>
+        <nav class="suite-nav">
+            <a href="{{ url_for('admin_index') }}">Admin Home</a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
+            <a class="active" href="{{ url_for('admin_notes') }}">Notes</a>
+            <a href="{{ url_for('admin_links') }}">Links</a>
+        </nav>
+        <div class="topbar">
+            <div class="title-stack">
+                <h1>Cool Notes</h1>
+                <p>Professional notes workspace for the admin suite with stylish cards, checklist tracking, reminders, tags, favorites, pinning, archive controls, and filters.</p>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('admin_index') }}">Admin home</a>
+                <a href="{{ url_for('admin_logout') }}">Log out</a>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><strong>{{ stats.total }}</strong><span>Total notes</span></div>
+            <div class="stat"><strong>{{ stats.active }}</strong><span>Active notes</span></div>
+            <div class="stat"><strong>{{ stats.pinned }}</strong><span>Pinned</span></div>
+            <div class="stat"><strong>{{ stats.favorites }}</strong><span>Favorites</span></div>
+            <div class="stat"><strong>{{ stats.archived }}</strong><span>Archived</span></div>
+        </div>
+
+        <div class="layout">
+            <section class="panel composer">
+                <h2>{% if editing_note %}Edit note{% else %}Create a note{% endif %}</h2>
+                <p class="sub">Give every note more personality and more useful structure, not just plain text.</p>
+                <form method="post">
+                    <input type="hidden" name="action" value="{% if editing_note %}update{% else %}create{% endif %}">
+                    {% if editing_note %}
+                    <input type="hidden" name="id" value="{{ editing_note.id }}">
+                    {% endif %}
+
+                    <label for="title">Title</label>
+                    <input id="title" type="text" name="title" value="{{ editing_note.title if editing_note else '' }}" placeholder="Mission plan, idea dump, school reminder..." required>
+
+                    <label for="content">Main note</label>
+                    <textarea id="content" name="content" placeholder="Write the full note here...">{{ editing_note.content if editing_note else '' }}</textarea>
+
+                    <div class="split">
+                        <div>
+                            <label for="category">Category</label>
+                            <input id="category" type="text" name="category" value="{{ editing_note.category if editing_note else '' }}" placeholder="General, School, Ideas, Personal">
+                        </div>
+                        <div>
+                            <label for="color">Card color</label>
+                            <select id="color" name="color">
+                                {% set current_color = editing_note.color if editing_note else 'aurora' %}
+                                {% for option in ['aurora', 'sunset', 'rose', 'lime', 'violet'] %}
+                                <option value="{{ option }}" {% if current_color == option %}selected{% endif %}>{{ option|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <label for="tags">Tags</label>
+                    <input id="tags" type="text" name="tags" value="{{ editing_tags }}" placeholder="important, ideas, homework">
+
+                    <label for="checklist">Checklist</label>
+                    <textarea id="checklist" name="checklist" placeholder="One task per line">{{ editing_checklist }}</textarea>
+
+                    <label for="reminder">Reminder</label>
+                    <input id="reminder" type="datetime-local" name="reminder" value="{{ editing_note.reminder if editing_note else '' }}">
+
+                    {% if not editing_note %}
+                    <label class="checkbox"><input type="checkbox" name="pin_on_save"> Pin this note when saving</label>
+                    {% endif %}
+
+                    <div class="actions">
+                        <button class="primary" type="submit">{% if editing_note %}Save changes{% else %}Create note{% endif %}</button>
+                        {% if editing_note %}
+                        <a class="secondary" href="{{ url_for('admin_notes') }}">Cancel edit</a>
+                        {% else %}
+                        <button class="secondary" type="reset">Clear</button>
+                        {% endif %}
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel board">
+                <h2>Notes board</h2>
+                <p class="sub">Search and filter your notes instantly.</p>
+
+                <form class="toolbar" method="get">
+                    <input type="text" name="q" value="{{ filters.q }}" placeholder="Search title, content, tags, checklist...">
+                    <select name="status">
+                        {% for option, label in [('all','All notes'), ('active','Active'), ('pinned','Pinned'), ('favorites','Favorites'), ('archived','Archived')] %}
+                        <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="category">
+                        <option value="">All categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category|title }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                {% if notes %}
+                <div class="note-grid">
+                    {% for note in notes %}
+                    <article class="note {{ note.color or 'aurora' }}">
+                        <div class="meta">
+                            <span class="pill">{{ note.category or 'General' }}</span>
+                            <div class="flags">
+                                {% if note.is_pinned %}<span class="pill">Pinned</span>{% endif %}
+                                {% if note.is_favorite %}<span class="pill">Favorite</span>{% endif %}
+                                {% if note.is_archived %}<span class="pill">Archived</span>{% endif %}
+                            </div>
+                        </div>
+
+                        <h3>{{ note.title }}</h3>
+
+                        {% if note.content %}
+                        <div class="content">{{ note.content }}</div>
+                        {% endif %}
+
+                        {% if note.checklist %}
+                        <div class="section">
+                            <strong>Checklist</strong>
+                            <ul>
+                                {% for item in note.checklist %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if note.tags %}
+                        <div class="tag-row">
+                            {% for tag in note.tags %}
+                            <span class="tag">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if note.reminder %}
+                        <div class="section"><strong>Reminder</strong><div>{{ note.reminder }}</div></div>
+                        {% endif %}
+
+                        <div class="section">
+                            <strong>Updated</strong>
+                            <div>{{ note.updated_at }}</div>
+                        </div>
+
+                        <div class="note-actions">
+                            <a href="{{ url_for('admin_notes', edit=note.id, q=filters.q, status=filters.status, category=filters.category) }}">Edit</a>
+
+                            <form method="post">
+                                <input type="hidden" name="action" value="toggle_pin">
+                                <input type="hidden" name="id" value="{{ note.id }}">
+                                <button type="submit">{% if note.is_pinned %}Unpin{% else %}Pin{% endif %}</button>
+                            </form>
+
+                            <form method="post">
+                                <input type="hidden" name="action" value="toggle_favorite">
+                                <input type="hidden" name="id" value="{{ note.id }}">
+                                <button type="submit">{% if note.is_favorite %}Unfavorite{% else %}Favorite{% endif %}</button>
+                            </form>
+
+                            <form method="post">
+                                <input type="hidden" name="action" value="toggle_archive">
+                                <input type="hidden" name="id" value="{{ note.id }}">
+                                <button type="submit">{% if note.is_archived %}Restore{% else %}Archive{% endif %}</button>
+                            </form>
+
+                            <form method="post" onsubmit="return confirm('Delete this note?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="{{ note.id }}">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty">No notes matched the current filter yet. Create one from the panel and it will appear here.</div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+    <script>
+        const nextTarget = {{ next_target|tojson }};
+
+        async function unlockAdmin() {
+            const passInput = document.getElementById('admin-pass');
+            const errorBox = document.getElementById('gate-error');
+            if (!passInput) return;
+            const res = await fetch('/api/admin/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ password: passInput.value })
+            });
+            if (res.ok) {
+                window.location.href = nextTarget || '/admin';
+                return;
+            }
+            if (errorBox) errorBox.style.display = 'block';
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && document.getElementById('gate')) unlockAdmin();
+        });
+
+        if (document.getElementById('gate')) {
+            const savedPassword = sessionStorage.getItem('adminMasterPassword');
+            const passInput = document.getElementById('admin-pass');
+            if (savedPassword && passInput) {
+                passInput.value = savedPassword;
+                unlockAdmin();
+            }
+        }
+    </script>
+</body>
+</html>
