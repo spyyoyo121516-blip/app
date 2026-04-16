@@ -3,5 +3,90 @@
     "notes": [],
     "banned_ips": [],
     "banned_users": [],
-    "logs": []
+    "logs": [
+        {
+            "ip": "127.0.0.1",
+            "path": "/",
+            "timestamp": "2026-04-16T19:02:37.131705+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/robots.txt",
+            "timestamp": "2026-04-16T19:02:37.209749+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/sitemap.xml",
+            "timestamp": "2026-04-16T19:02:37.395402+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin",
+            "timestamp": "2026-04-16T19:02:37.730382+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/login",
+            "timestamp": "2026-04-16T19:02:37.811304+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/dashboard",
+            "timestamp": "2026-04-16T19:02:37.863530+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/notes",
+            "timestamp": "2026-04-16T19:02:38.063766+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/admin/links",
+            "timestamp": "2026-04-16T19:02:38.291412+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom",
+            "timestamp": "2026-04-16T19:02:38.377444+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/login",
+            "timestamp": "2026-04-16T19:02:38.480053+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/verify",
+            "timestamp": "2026-04-16T19:02:38.532731+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/character",
+            "timestamp": "2026-04-16T19:02:38.591184+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/game",
+            "timestamp": "2026-04-16T19:02:38.624537+00:00",
+            "user": "Guest"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/admin",
+            "timestamp": "2026-04-16T19:02:38.707753+00:00",
+            "user": "Guest"
+        }
+    ]
 }
