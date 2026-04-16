@@ -6,6 +6,7 @@ import os
 import random
 
 from flask import Flask, Response, abort, jsonify, redirect, render_template, request, session, url_for
+from jinja2 import ChoiceLoader, FileSystemLoader, TemplateNotFound
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,10 +22,37 @@ ADMIN_DB = os.environ.get(
 
 
 app = Flask(__name__)
+app.jinja_loader = ChoiceLoader([
+    app.jinja_loader,
+    FileSystemLoader(BASE_DIR),
+])
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-admin-change-me')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 MASTER_ADMIN_PASS = "XyZ9#kP2$mQv8L3wR5tN7bJ!"
+
+LEGACY_PATH_REDIRECTS = {
+    '/index.html': '/',
+    '/home': '/',
+    '/home.html': '/',
+    '/admin/index.html': '/admin',
+    '/admin/login.html': '/admin/login',
+    '/admin/dashboard.html': '/admin/dashboard',
+    '/admin/notes.html': '/admin/notes',
+    '/admin/links.html': '/admin/links',
+    '/kindom': '/kingdom',
+    '/kindom/login': '/kingdom/login',
+    '/kindom/verify': '/kingdom/verify',
+    '/kindom/character': '/kingdom/character',
+    '/kindom/game': '/kingdom/game',
+    '/kindom/admin': '/kingdom/admin',
+    '/kingdom/index.html': '/kingdom',
+    '/kingdom/login.html': '/kingdom/login',
+    '/kingdom/verify.html': '/kingdom/verify',
+    '/kingdom/character.html': '/kingdom/character',
+    '/kingdom/game.html': '/kingdom/game',
+    '/kingdom/admin.html': '/kingdom/admin',
+}
 
 def empty_kingdom_db():
     return {
@@ -352,9 +380,16 @@ def favicon():
 
 @app.errorhandler(404)
 def page_not_found(error):
+    if request.path.startswith('/api/'):
+        return jsonify({"status": "error", "message": "Not found"}), 404
 
-    if request.path.endswith('/'):
-        return redirect(request.path[:-1])
+    normalized_path = request.path.rstrip('/') or '/'
+    legacy_target = LEGACY_PATH_REDIRECTS.get(normalized_path.lower())
+    if legacy_target:
+        return redirect(legacy_target, code=301)
+
+    if request.path.endswith('/') and request.path != '/':
+        return redirect(normalized_path, code=301)
 
     return redirect('/')
 
@@ -362,7 +397,10 @@ def page_not_found(error):
 @app.route('/')
 def index():
     if is_app_site_request():
-        return render_template('app/index.html')
+        try:
+            return render_template('app/index.html')
+        except TemplateNotFound:
+            app.logger.warning("templates/app/index.html not found; falling back to templates/index.html")
     return render_template('index.html')
 
 # --- NEW ADMIN FOLDER ROUTES ---
