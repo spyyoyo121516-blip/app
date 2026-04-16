@@ -320,6 +320,7 @@
             <a href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
             <a href="{{ url_for('admin_notes') }}">Notes</a>
             <a href="{{ url_for('admin_links') }}">Links</a>
+            <a href="{{ url_for('admin_files') }}">Files</a>
         </nav>
         <section class="hero">
             <div class="hero-grid">
@@ -331,6 +332,7 @@
                         <a class="big-btn alt" href="{{ url_for('kingdom_admin') }}">Open Kingdom Admin</a>
                         <a class="big-btn" href="{{ url_for('admin_dashboard') }}">Open Dashboard</a>
                         <a class="big-btn" href="{{ url_for('admin_notes') }}">Open Notes</a>
+                        <a class="big-btn" href="{{ url_for('admin_files') }}">Open Files</a>
                     </div>
                 </div>
                 <aside class="hero-side">
@@ -379,6 +381,11 @@
                 <span class="card-tag">Reference Deck</span>
                 <h3>Links</h3>
                 <p>Store important URLs, reference pages, and admin shortcuts in one place.</p>
+            </a>
+            <a class="card" href="{{ url_for('admin_files') }}" data-mark="05">
+                <span class="card-tag">Asset Vault</span>
+                <h3>Files</h3>
+                <p>Upload, review, download, and remove shared admin files from one place.</p>
             </a>
         </section>
 

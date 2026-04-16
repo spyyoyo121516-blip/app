@@ -7,6 +7,7 @@ import random
 
 from flask import Flask, Response, abort, jsonify, redirect, render_template, request, session, url_for
 from jinja2 import ChoiceLoader, FileSystemLoader, TemplateNotFound
+from werkzeug.utils import secure_filename
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -30,16 +31,29 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-admin-change-me')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 MASTER_ADMIN_PASS = "XyZ9#kP2$mQv8L3wR5tN7bJ!"
+UPLOADS_DIR = os.path.join(BASE_DIR, 'static', 'uploads')
 
 LEGACY_PATH_REDIRECTS = {
     '/index.html': '/',
     '/home': '/',
     '/home.html': '/',
+    '/kingdom.html': '/kingdom',
+    '/login.html': '/kingdom/login',
+    '/verify.html': '/kingdom/verify',
+    '/character.html': '/kingdom/character',
+    '/char.html': '/kingdom/character',
+    '/game.html': '/kingdom/game',
+    '/admin.html': '/admin',
+    '/dashboard.html': '/admin/dashboard',
+    '/notes.html': '/admin/notes',
+    '/links.html': '/admin/links',
+    '/files.html': '/admin/files',
     '/admin/index.html': '/admin',
     '/admin/login.html': '/admin/login',
     '/admin/dashboard.html': '/admin/dashboard',
     '/admin/notes.html': '/admin/notes',
     '/admin/links.html': '/admin/links',
+    '/admin/files.html': '/admin/files',
     '/kindom': '/kingdom',
     '/kindom/login': '/kingdom/login',
     '/kindom/verify': '/kingdom/verify',
@@ -50,8 +64,22 @@ LEGACY_PATH_REDIRECTS = {
     '/kingdom/login.html': '/kingdom/login',
     '/kingdom/verify.html': '/kingdom/verify',
     '/kingdom/character.html': '/kingdom/character',
+    '/kingdom/char.html': '/kingdom/character',
     '/kingdom/game.html': '/kingdom/game',
     '/kingdom/admin.html': '/kingdom/admin',
+}
+
+NOINDEX_PREFIXES = (
+    '/admin',
+    '/api',
+)
+
+NOINDEX_PATHS = {
+    '/kingdom/login',
+    '/kingdom/verify',
+    '/kingdom/character',
+    '/kingdom/game',
+    '/kingdom/admin',
 }
 
 def empty_kingdom_db():
@@ -103,6 +131,12 @@ def ensure_db_file(path):
             json.dump(default_db_for(path), f, indent=4)
     except PermissionError as exc:
         raise DatabasePermissionError(permission_error_message(path, "create")) from exc
+
+def ensure_uploads_dir():
+    try:
+        os.makedirs(UPLOADS_DIR, exist_ok=True)
+    except PermissionError as exc:
+        raise DatabasePermissionError(permission_error_message(UPLOADS_DIR, "prepare uploads")) from exc
 
 # --- DATABASE HELPERS ---
 
@@ -338,6 +372,7 @@ def track_and_check_bans():
 
 try:
     init_dbs()
+    ensure_uploads_dir()
 except DatabasePermissionError as exc:
     app.logger.error(str(exc))
 
@@ -356,6 +391,13 @@ def robots():
     lines = [
         "User-agent: *",
         "Allow: /",
+        "Disallow: /admin",
+        "Disallow: /api",
+        "Disallow: /kingdom/login",
+        "Disallow: /kingdom/verify",
+        "Disallow: /kingdom/character",
+        "Disallow: /kingdom/game",
+        "Disallow: /kingdom/admin",
         f"Sitemap: {request.url_root.rstrip('/')}/sitemap.xml"
     ]
     return Response("\n".join(lines), mimetype="text/plain")
@@ -402,6 +444,16 @@ def index():
         except TemplateNotFound:
             app.logger.warning("templates/app/index.html not found; falling back to templates/index.html")
     return render_template('index.html')
+
+@app.after_request
+def apply_robots_headers(response):
+    normalized_path = request.path.rstrip('/') or '/'
+    should_noindex = normalized_path in NOINDEX_PATHS or any(
+        normalized_path.startswith(prefix) for prefix in NOINDEX_PREFIXES
+    )
+    if should_noindex:
+        response.headers['X-Robots-Tag'] = 'noindex, nofollow, noarchive'
+    return response
 
 # --- NEW ADMIN FOLDER ROUTES ---
 
@@ -605,6 +657,45 @@ def admin_links():
     return render_template(
         'admin/links.html',
         links=db.get('links', []) if admin_unlocked else [],
+        admin_unlocked=admin_unlocked,
+        next_target=request.path,
+    )
+
+@app.route('/admin/files', methods=['GET', 'POST'])
+def admin_files():
+    if request.method == 'POST' and not session.get('master_admin'):
+        return redirect(url_for('admin_index', next=request.path))
+
+    ensure_uploads_dir()
+    admin_unlocked = bool(session.get('master_admin'))
+
+    if request.method == 'POST':
+        delete_name = secure_filename(request.form.get('delete') or '')
+        uploaded_file = request.files.get('file')
+
+        if delete_name:
+            target_path = os.path.abspath(os.path.join(UPLOADS_DIR, delete_name))
+            uploads_root = os.path.abspath(UPLOADS_DIR)
+            if target_path.startswith(uploads_root + os.sep) and os.path.isfile(target_path):
+                os.remove(target_path)
+        elif uploaded_file and uploaded_file.filename:
+            filename = secure_filename(uploaded_file.filename)
+            if filename:
+                uploaded_file.save(os.path.join(UPLOADS_DIR, filename))
+
+        return redirect(url_for('admin_files'))
+
+    files = []
+    if admin_unlocked:
+        files = sorted(
+            file_name
+            for file_name in os.listdir(UPLOADS_DIR)
+            if os.path.isfile(os.path.join(UPLOADS_DIR, file_name))
+        )
+
+    return render_template(
+        'admin/files.html',
+        files=files,
         admin_unlocked=admin_unlocked,
         next_target=request.path,
     )
@@ -844,6 +935,8 @@ def kingdom_session():
 
 @app.route('/api/kingdom/data', methods=['GET'])
 def get_kingdom_data():
+    if not session.get('master_admin'):
+        return jsonify({"status": "error", "message": "Admin access required"}), 403
     return jsonify(get_db(KINGDOM_DB))
 
 @app.route('/api/kingdom/save-hero', methods=['POST'])

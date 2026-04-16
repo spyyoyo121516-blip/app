@@ -218,6 +218,7 @@
             <a href="{{ url_for('kingdom_admin') }}">Kingdom Admin</a>
             <a href="{{ url_for('admin_notes') }}">Notes</a>
             <a class="active" href="{{ url_for('admin_links') }}">Links</a>
+            <a href="{{ url_for('admin_files') }}">Files</a>
         </nav>
         <section class="hero">
             <div class="hero-grid">
@@ -299,6 +300,7 @@
                 body: JSON.stringify({ password: passInput.value })
             });
             if (res.ok) {
+                sessionStorage.setItem('adminMasterPassword', passInput.value);
                 window.location.href = nextTarget || '/admin';
                 return;
             }
