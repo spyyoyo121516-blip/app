@@ -1,0 +1,38 @@
+{
+    "links": [],
+    "notes": [],
+    "banned_ips": [],
+    "banned_users": [],
+    "logs": [
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom",
+            "timestamp": "2026-04-16T16:53:56.438861+00:00",
+            "user": "tester"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/login",
+            "timestamp": "2026-04-16T16:53:56.743639+00:00",
+            "user": "tester"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/kingdom/verify",
+            "timestamp": "2026-04-16T16:53:56.809773+00:00",
+            "user": "tester"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/kingdom/battles",
+            "timestamp": "2026-04-16T16:53:56.868148+00:00",
+            "user": "tester"
+        },
+        {
+            "ip": "127.0.0.1",
+            "path": "/api/kingdom/battle/b0_1776358436/action",
+            "timestamp": "2026-04-16T16:53:57.159346+00:00",
+            "user": "tester"
+        }
+    ]
+}
